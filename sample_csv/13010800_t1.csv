@@ -1,0 +1,5 @@
+source,url,date,day,table,account,is_total,close_today,open_today,open_mo,open_fy
+Daily Treasury Statement,https://www.fms.treas.gov/fmsweb/viewDTSFiles?dir=w&fname=13010800.txt,2013-01-08,Tuesday,TABLE I  Operating Cash Balance,Federal Reserve Account,0,57168,63870,92720,85446
+Daily Treasury Statement,https://www.fms.treas.gov/fmsweb/viewDTSFiles?dir=w&fname=13010800.txt,2013-01-08,Tuesday,TABLE I  Operating Cash Balance,Supplementary Financing Program Account,0,0,0,0,0
+Daily Treasury Statement,https://www.fms.treas.gov/fmsweb/viewDTSFiles?dir=w&fname=13010800.txt,2013-01-08,Tuesday,TABLE I  Operating Cash Balance,Short-Term Cash Investments (Table V),0,0,0,0,0
+Daily Treasury Statement,https://www.fms.treas.gov/fmsweb/viewDTSFiles?dir=w&fname=13010800.txt,2013-01-08,Tuesday,TABLE I  Operating Cash Balance,Total Operating Balance,1,57168,63870,92720,85446
