@@ -45,3 +45,13 @@ p.balance <- ggplot(fms.day) + aes(x = date, y = balance) +
     scale_x_date('Date') +
     scale_y_continuous('Balance', label = dollar) +
     geom_line()
+
+pdf('exploratory.plots.pdf', width = 11, height = 8.5)
+print(p.day)
+print(p.rolling)
+print(p.joined)
+print(p.rolling.joined)
+print(p.day.of.month)
+print(p.day.of.month.withdraw)
+print(p.balance)
+dev.off()
