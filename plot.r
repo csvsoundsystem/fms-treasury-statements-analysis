@@ -15,6 +15,12 @@ p.rolling <- ggplot(melt(fms.rolling, 'date', variable.name = 'Item', value.name
 
 p.joined <- ggplot(fms.joined.molten) + aes(x = value, y = percentage, color = variable) +
     scale_x_continuous('Cash flow', label = dollar) +
-    scale_y_continuous('Percentage of mentions of "spending" total words', label = percent) +
+    scale_y_continuous('Mentions of "spending" per total words', label = percent) +
+    labs(table = 'Discussion of spending is higher when net change is near zero') +
+    geom_point(alpha = 0.3)
+
+p.rolling.joined <- ggplot(fms.rolling.joined.molten) + aes(x = value, y = percentage, color = variable) +
+    scale_x_continuous('Cash flow', label = dollar) +
+    scale_y_continuous('Mentions of "spending" per total words', label = percent) +
     labs(table = 'Discussion of spending is higher when net change is near zero') +
     geom_point(alpha = 0.3)
