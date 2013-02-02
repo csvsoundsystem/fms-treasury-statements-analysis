@@ -1,42 +1,19 @@
 library(reshape2)
 library(stringr)
+library(zoo)
 setwd("/Users/brian/Dropbox/code/fms-treasury-statements-analysis")
-strip <- function(string) {
-    # Strip leading and trailing spaces
-    str_replace(str_replace(string, '^ *', ''), ':? *$', '')
+d <- read.csv("fms.day.csv", stringsAsFactors=F)
+
+z <- function(x) {
+    (x-mean(x))/sd(x)
 }
+d$w_d <- z(d$withdrawals)
+d$w_d <- ifelse(abs(d$w_d)>4, 1, 0)
+d$big <- ifelse(d$change>50000, 1, 0)
+x <- as.Date(d$date)
 
-number <- function(string){
-    # Remove the leading dollar sign, remove commas, and convert to numeric.
-    as.numeric(str_replace_all(str_replace(strip(string), '^[$]?(?:[0-9]/)?', ''), ',', ''))
+for(i in 1:nrow(d)){jkk1
+    if(d$big[i]==1) {
+        abline(v=x[i], col="blue", lwd=0.1)
+    }
 }
-
-fms <- read.fwf('summary.fixie',
-    c(9, 50, 13, 1, 13, 1, 13), skip = 1,
-    col.names = c('file', 'item', 'today', 'space1', 'mtd', 'space2', 'ytd')
-)[-c(4,6)]
-
-# Remove na
-fms <- na.omit(fms)
-
-# Strip spaces
-fms <- data.frame(lapply(fms, strip))
-
-# Make numbers
-fms[c('today', 'mtd', 'ytd')] <- data.frame(lapply(fms[c('today', 'mtd', 'ytd')], number))
-
-# Make dates
-fms$date <- as.Date(strptime(fms$file, format = '%Y%m%d'))
-fms$file <- NULL
-head(fms)
-# Different slices
-fms.item <- fms
-fms.day <- dcast(fms, date ~ item, value.var = 'today')
-names(fms.day) <- c("date", "chance", "deposits", "withdrawals")
-
-
-# Rolling mean
-fms.rolling <- data.frame(lapply(fms.day[-1], rollmean, k = 7))
-fms.rolling$date <- fms.day$date[4:(nrow(fms.day) - 3)]
-
-
