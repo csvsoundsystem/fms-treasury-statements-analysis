@@ -40,3 +40,8 @@ p.day.of.month.withdraw <- ggplot(subset(fms.item, item == 'Total Withdrawals (e
     scale_y_continuous('Amount', label = dollar) +
     labs(table = 'Spending is above or below $50,000 unless it\'s the middle or end of the month') +
     geom_jitter()
+
+p.balance <- ggplot(fms.day) + aes(x = date, y = balance) +
+    scale_x_date('Date') +
+    scale_y_continuous('Balance', label = dollar) +
+    geom_line()
