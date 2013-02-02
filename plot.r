@@ -17,4 +17,4 @@ p.joined <- ggplot(fms.joined.molten) + aes(x = value, y = percentage, color = v
     scale_x_continuous('Cash flow', label = dollar) +
     scale_y_continuous('Percentage of mentions of "spending" total words', label = percent) +
     labs(table = 'Discussion of spending is higher when net change is near zero') +
-    geom_point()
+    geom_point(alpha = 0.3)
