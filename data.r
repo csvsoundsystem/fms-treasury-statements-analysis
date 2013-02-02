@@ -39,3 +39,7 @@ rm(fms)
 fms.rolling <- data.frame(lapply(fms.day[-1], rollmean, k = 7))
 names(fms.rolling) <- c('net.change', 'deposits', 'withdrawals')
 fms.rolling$date <- fms.day$date[4:(nrow(fms.day) - 3)]
+
+
+balance.at.start <- 
+fms.day$balance <- balance.at.start + cumsum(fms.day$net.change)
