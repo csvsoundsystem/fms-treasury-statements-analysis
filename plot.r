@@ -13,4 +13,8 @@ p.rolling <- ggplot(melt(fms.rolling, 'date', variable.name = 'Item', value.name
     labs(title = 'Daily federal cash flow') +
     geom_line()
 
-#p.1 <- ggplot(fms.joined) + aes(x = :
+p.joined <- ggplot(fms.joined.molten) + aes(x = value, y = percentage, color = variable) +
+    scale_x_continuous('Cash flow', label = dollar) +
+    scale_y_continuous('Percentage of mentions of "spending" total words', label = percent) +
+    labs(table = 'Discussion of spending is higher when net change is near zero') +
+    geom_point()
