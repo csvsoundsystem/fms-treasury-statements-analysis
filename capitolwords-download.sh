@@ -8,4 +8,4 @@ if [ "$phrase" = '' ]; then
   exit 1
 fi
 
-curl --create-dirs -o "capitolwords/${phrase}.json" "http://capitolwords.org/api/1/dates.json?apikey=1bcff5b8d96e40d1a0b47665b759df9f&phrase=$phrase"
+curl --create-dirs -o "capitolwords/${phrase}.json" "http://capitolwords.org/api/1/dates.json?apikey=1bcff5b8d96e40d1a0b47665b759df9f&percentages=true&phrase=$phrase"
