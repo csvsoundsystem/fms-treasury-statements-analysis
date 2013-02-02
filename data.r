@@ -12,7 +12,7 @@ number <- function(string){
     as.numeric(str_replace_all(str_replace(strip(string), '^[$]?(?:[0-9]/)?', ''), ',', ''))
 }
 
-fms <- read.fwf('/tmp/summary.fixie',
+fms <- read.fwf('summary.fixie',
     c(9, 50, 13, 1, 13, 1, 13), skip = 1,
     col.names = c('file', 'item', 'today', 'space1', 'mtd', 'space2', 'ytd')
 )[-c(4,6)]
