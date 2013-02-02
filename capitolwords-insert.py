@@ -7,7 +7,12 @@ import dumptruck
 dt = dumptruck.DumpTruck(dbname = '/tmp/capitolwords.db')
 
 phrase = sys.argv[1]
-filename = os.path.join('capitolwords', phrase + '.json')
+try:
+    filename = os.path.join('capitolwords', phrase + '.json')
+except:
+    print('USAGE: %s [phrase]' % sys.argv[0])
+    exit(1)
+
 print('Loading ' + filename)
 f = open(filename)
 d = json.load(f)

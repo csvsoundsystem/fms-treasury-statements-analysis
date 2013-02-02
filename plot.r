@@ -12,3 +12,5 @@ p.rolling <- ggplot(melt(fms.rolling, 'date', variable.name = 'Item', value.name
     scale_y_continuous('Amount (7-business-day moving average)', label = dollar) +
     labs(title = 'Daily federal cash flow') +
     geom_line()
+
+#p.1 <- ggplot(fms.joined) + aes(x = :
