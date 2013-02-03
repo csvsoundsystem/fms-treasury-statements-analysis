@@ -161,14 +161,14 @@ frame <- function(i) {
     text(
         x = weighted.mean(range(table2.toplot$date), c(1, 9)),
         y = c(
-            weighted.mean(range(table2.toplot$balance), c(2, 30)),
-            weighted.mean(range(table2.toplot$balance), c(3, 30))
+            weighted.mean(range(table2.toplot$balance), c(1, 15)),
+            weighted.mean(range(table2.toplot$balance), c(2, 15))
         ),
         labels = c(
             'FMS Soundsystem',
             strftime(table2.toplot[i,'date'], format = '%B %Y')
         ),
-        col = fg, pos = 3, font = 2
+        col = fg, pos = 3, font = 2:1
     )
 
     ticks <- seq(-2e5, 6e5, 1e5)
