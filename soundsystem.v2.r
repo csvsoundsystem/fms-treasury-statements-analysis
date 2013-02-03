@@ -111,7 +111,7 @@ frame <- function(i) {
     polygon(
         c(table2.toplot[1:i,'date'], table2.toplot[i:1,'date']),
         c(table2.toplot[1:i,'balance'], table2.toplot[i:1,'balance']) + c(table2.toplot[1:i,'error'], - table2.toplot[i:1,'error']),
-        col = 1
+        col = fg
     )
     # Under month
     rect(
@@ -147,7 +147,7 @@ frame <- function(i) {
     )
 
     ticks <- seq(-2e5, 6e5, 1e5)
-    axis(2, at = ticks, labels = round(ticks / 1000))
+    axis(2, at = ticks, labels = round(ticks / 1000), col = fg, col.ticks = fg)
     face(i,
         x = table2.toplot[i,'date'],
         y = table2.toplot[i,'balance'],
@@ -160,10 +160,10 @@ frame <- function(i) {
     plot(
          table2.toplot[1:i,'rate'] ~ table2.toplot[1:i,'date'],
          axes = F, xlab = '', ylab = '', type = 'l',
-         xlim = range(table2.toplot$date), ylim = c(0, max(table2.toplot$rate))
+         xlim = range(table2.toplot$date), ylim = c(-2, max(table2.toplot$rate))
     )
-    mtext("Federal interest rate (%)", side=4, line=3)
-    axis(4)
+    mtext("Federal interest rate", side=4, line=3)
+    axis(4, at = 1:5, labels = paste(1:5, '%', sep = ''))
 }
 
 # frame(30)
