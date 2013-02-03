@@ -54,7 +54,7 @@ face <- function(day.or.days, x, y, ...) {
 }
 
 # Other plot stuff
-table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = var(df$today)) })
+table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = sd(df$today)) })
 table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])
 
 # Video frame
@@ -64,12 +64,17 @@ frame <- function(i) {
     }
     plot(
         table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
-        type = 'l', lwd = table2.toplot[1:i,'error'] / 1e7,
+        type = 'l',
         xlim = range(table2.toplot$date),
         ylim = range(table2.toplot$balance),
         xlab = '', #Date
         ylab = 'Cash in the bank', main = 'FMS Soundsystem',
-        axes = F
+        axes = F, col = 2
+    )
+    polygon(
+        c(table2.toplot[1:i,'date'], table2.toplot[i:1,'date']),
+        c(table2.toplot[1:i,'balance'], table2.toplot[i:1,'balance']) + c(table2.toplot[1:i,'error'], - table2.toplot[i:1,'error']),
+        col = 1
     )
     text(
         x = max(table2.toplot$date),
