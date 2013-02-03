@@ -72,9 +72,14 @@ frame <- function(i) {
         axes = F
     )
     text(
-        x = weighted.mean(range(table2.toplot$date), c(0.1, 0.9)),
-        y = mean(range(table2.toplot$balance)),
-        labels = strftime(table2.toplot[i,'date'], format = '%B %Y')
+        x = max(table2.toplot$date),
+        y = c(0, 3000) + mean(range(table2.toplot$balance)),
+        labels = c(
+            sub('\\$-', '-$', paste('$', as.character(table2.toplot[i,'balance']), sep = '')),
+            strftime(table2.toplot[i,'date'], format = '%B %Y')
+        ),
+        pos = 2
+
     )
   # axis(1, at = range(table2.toplot$date), labels = range(table2.toplot$date))
     axis(2)
