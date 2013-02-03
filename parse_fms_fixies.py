@@ -79,16 +79,22 @@ def table_2_merge_and_drop_rows(i):
 			fwfs[i] = fwfs[i].drop(line_ind)
 	return fwfs[i]
 
-def table_3_merge_and_drop_rows(i):
-	null_row_inds = fwfs[i][fwfs[i]['item'].isnull() & fwfs[i]['today'].isnull() & fwfs[i]['mtd'].isnull() & fwfs[i]['fytd'].isnull()].index
+def drop_null_rows(i):
+	null_row_inds = fwfs[i][fwfs[i]['item'].isnull()].index# & fwfs[i]['today'].isnull() & fwfs[i]['mtd'].isnull() & fwfs[i]['fytd'].isnull()].index
 	if len(null_row_inds) > 0:
 		for null_row_ind in null_row_inds:
 			fwfs[i] = fwfs[i].drop(null_row_ind)
 	return fwfs[i]
 
+def find_first_divider_row(i):
+	divider_row_inds = fwfs[i][fwfs[i]['item'].str.contains(r'^\s?TABLE\s\w')].index
+	if len(divider_row_inds) > 0:
+		return divider_row_inds[0]
+
+
 
 f_names_all = os.listdir('/Users/bjdewilde/Dropbox/FMS/Scraped_txt_files_2013_to_2005/')
-f_names = f_names_all[:-999]
+f_names = f_names_all[:]
 #f_names = ['08010300.txt']
 for f_name in reversed(f_names):
 
@@ -169,28 +175,28 @@ for f_name in reversed(f_names):
     #                 Deposits                          Today         month         year
     #                                                                to date      to date
 	# ____________________________________________________________________________________________
-	skiprows=11
-	if date > datetime.date(2012, 5, 31):
-		cols = [(0,51), (51,65), (65,79), (79,92)]
-	else:
-		cols = [(0,46), (46,61), (61,76), (76,92)]
-	if date < datetime.date(2008, 1, 4):
-		skiprows = 12
-	fwfs[2] = pd.read_fwf(StringIO.StringIO(str(pages[2])), skiprows=skiprows, thousands=',', #skipfooter=2, 
-		colspecs=cols,
-		names=['item', 'today', 'mtd', 'fytd'],
-		converters={'item':clean_text, 'today':clean_text, 'mtd':clean_text, 'fytd':clean_text})
-	fwfs[2] = table_2_merge_and_drop_rows(2)
-	fwfs[2]['source'] = 'Daily Treasury Statement'
-	fwfs[2]['url'] = url
-	fwfs[2]['date'] = str(date)
-	fwfs[2]['day'] = day
-	fwfs[2]['table'] = get_table_name(pages[2])
-	fwfs[2]['account'] = 'Federal Reserve Account'
-	fwfs[2]['type'] = 'deposit'
-	fwfs[2]['subtype'] = ''
-	fwfs[2]['is_total'] = fwfs[2]['item'].str.startswith('Total').astype(np.int16)
-	fwfs[2] = handle_footnotes(2)
+	# skiprows=11
+	# if date > datetime.date(2012, 5, 31):
+	# 	cols = [(0,51), (51,65), (65,79), (79,92)]
+	# else:
+	# 	cols = [(0,46), (46,61), (61,76), (76,92)]
+	# if date < datetime.date(2008, 1, 4):
+	# 	skiprows = 12
+	# fwfs[2] = pd.read_fwf(StringIO.StringIO(str(pages[2])), skiprows=skiprows, thousands=',', #skipfooter=2, 
+	# 	colspecs=cols,
+	# 	names=['item', 'today', 'mtd', 'fytd'],
+	# 	converters={'item':clean_text, 'today':clean_text, 'mtd':clean_text, 'fytd':clean_text})
+	# fwfs[2] = table_2_merge_and_drop_rows(2)
+	# fwfs[2]['source'] = 'Daily Treasury Statement'
+	# fwfs[2]['url'] = url
+	# fwfs[2]['date'] = str(date)
+	# fwfs[2]['day'] = day
+	# fwfs[2]['table'] = get_table_name(pages[2])
+	# fwfs[2]['account'] = 'Federal Reserve Account'
+	# fwfs[2]['type'] = 'deposit'
+	# fwfs[2]['subtype'] = ''
+	# fwfs[2]['is_total'] = fwfs[2]['item'].str.startswith('Total').astype(np.int16)
+	# fwfs[2] = handle_footnotes(2)
 
 	# PAGE: 3
 	#___________________________________________________________________________________________
@@ -198,31 +204,31 @@ for f_name in reversed(f_names):
     #                Withdrawals                        Today         month         year
     #                                                                to date      to date
 	#____________________________________________________________________________________________
-	skiprows=9
-	if date < datetime.date(2008, 1, 4):
-		skiprows = 11
-	fwfs[3] = pd.read_fwf(StringIO.StringIO(str(pages[3])), skiprows=skiprows, thousands=',', #skipfooter=2, 
-		colspecs=cols,
-		names=['item', 'today', 'mtd', 'fytd'],
-		converters={'item':clean_text, 'today':clean_text, 'mtd':clean_text, 'fytd':clean_text})
-	fwfs[3] = table_2_merge_and_drop_rows(3)
-	fwfs[3]['source'] = 'Daily Treasury Statement'
-	fwfs[3]['url'] = url
-	fwfs[3]['date'] = date
-	fwfs[3]['day'] = day
-	fwfs[3]['table'] = get_table_name(pages[2])
-	fwfs[3]['account'] = 'Federal Reserve Account'
-	fwfs[3]['type'] = 'withdrawal'
-	fwfs[3]['subtype'] = ''
-	fwfs[3]['is_total'] = fwfs[3]['item'].str.startswith('Total').astype(np.int16)
-	fwfs[3] = handle_footnotes(3)
+	# skiprows=9
+	# if date < datetime.date(2008, 1, 4):
+	# 	skiprows = 11
+	# fwfs[3] = pd.read_fwf(StringIO.StringIO(str(pages[3])), skiprows=skiprows, thousands=',', #skipfooter=2, 
+	# 	colspecs=cols,
+	# 	names=['item', 'today', 'mtd', 'fytd'],
+	# 	converters={'item':clean_text, 'today':clean_text, 'mtd':clean_text, 'fytd':clean_text})
+	# fwfs[3] = table_2_merge_and_drop_rows(3)
+	# fwfs[3]['source'] = 'Daily Treasury Statement'
+	# fwfs[3]['url'] = url
+	# fwfs[3]['date'] = date
+	# fwfs[3]['day'] = day
+	# fwfs[3]['table'] = get_table_name(pages[2])
+	# fwfs[3]['account'] = 'Federal Reserve Account'
+	# fwfs[3]['type'] = 'withdrawal'
+	# fwfs[3]['subtype'] = ''
+	# fwfs[3]['is_total'] = fwfs[3]['item'].str.startswith('Total').astype(np.int16)
+	# fwfs[3] = handle_footnotes(3)
 
-	# TABLE 2 MERGE	
-	fwfs['t2'] = pd.concat([fwfs[2], fwfs[3]], axis=0, join='inner', ignore_index=True)
-	if save_to_csv:
-		fwfs['t2'].to_csv(SAVE_DIR_NAME + 'csv/table2/' + f_name[:-4] + '_t2.csv',
-			cols=['source', 'url', 'date', 'day', 'table', 'account', 'item', 'type', 'subtype', 'is_total', 'today', 'mtd', 'fytd', 'footnote'],
-			index=False)
+	# # TABLE 2 MERGE	
+	# fwfs['t2'] = pd.concat([fwfs[2], fwfs[3]], axis=0, join='inner', ignore_index=True)
+	# if save_to_csv:
+	# 	fwfs['t2'].to_csv(SAVE_DIR_NAME + 'csv/table2/' + f_name[:-4] + '_t2.csv',
+	# 		cols=['source', 'url', 'date', 'day', 'table', 'account', 'item', 'type', 'subtype', 'is_total', 'today', 'mtd', 'fytd', 'footnote'],
+	# 		index=False)
 
 
 	# PAGE: 4
@@ -232,7 +238,7 @@ for f_name in reversed(f_names):
 	#                                                                     This         Fiscal
 	#                      Issues                           Today         month         year
 	#                                                                    to date      to date
-	#____________________________________________________________________________________________
+	# ____________________________________________________________________________________________
 	#fwfs[4] = pd.read_fwf(StringIO.StringIO(str(pages[4])), skiprows=11, skipfooter=2, thousands=',',
 	#	colspecs=[(0,51), (51,65), (65,79), (79,92)],
 	#	names=['item', 'today', 'mtd', 'fytd'],
@@ -247,6 +253,63 @@ for f_name in reversed(f_names):
 	#fwfs[4]['subtype'] = ''
 	#fwfs[4]['is_total'] = fwfs[4]['item'].str.startswith('Total').astype(np.int16)
 	#fwfs[4]['footnotes'] = ''
+
+
+	# PAGE: 7
+	# ___________________________________________________________________________________________
+    #  TABLE IV  Federal Tax Deposits
+	# ___________________________________________________________________________________________
+    #                                                                 This         Fiscal
+    #              Classification                       Today         month         year
+    #                                                                to date      to date
+	# ____________________________________________________________________________________________
+	#if date > datetime.date(2012, 5, 31):
+	cols = [(0,51), (51,65), (65,78), (78,92)]
+	skiprows = 10
+	if date <= datetime.date(2012, 5, 31):
+		cols = [(0,48), (48,64), (64,80), (80,92)]
+	if date <= datetime.date(2008, 1, 3):
+		skiprows = 12
+	#else:
+	#	cols = [(0,46), (46,61), (61,76), (76,92)]
+	fwfs[7] = pd.read_fwf(StringIO.StringIO(str(pages[7])), skiprows=skiprows, thousands=',', #skipfooter=2,
+		colspecs=cols,
+		names=['item', 'today', 'mtd', 'fytd'],
+		converters={'item':clean_text, 'today':clean_text, 'mtd':clean_text, 'fytd':clean_text})
+	fwfs[7] = drop_null_rows(7)
+	split_ind = find_first_divider_row(7)
+	# HACK HACK HACK
+	if date > datetime.date(2012, 5, 31):
+		fwfs[7] = fwfs[7].ix[:split_ind-2, :]
+	else:
+		fwfs[7] = fwfs[7].ix[:split_ind-1, :]
+	fwfs[7] = table_2_merge_and_drop_rows(7)
+	fwfs[7] = handle_footnotes(7)
+	fwfs[7] = fwfs[7].drop_duplicates()
+	fwfs[7]['source'] = 'Daily Treasury Statement'
+	fwfs[7]['url'] = url
+	fwfs[7]['date'] = date
+	fwfs[7]['day'] = day
+	fwfs[7]['table'] = get_table_name(pages[7])
+	fwfs[7]['is_total'] = fwfs[7]['item'].str.startswith('Total').astype(np.int16)
+	fwfs[7] = fwfs[7].reset_index(drop=True)
+	# HACK HACK HACK
+	if date <= datetime.date(2012, 3, 30) and date >= datetime.date(2012, 1, 13):
+		fwfs[7] = fwfs[7].ix[:len(fwfs[7])-3, :]
+	elif date <= datetime.date(2012, 9, 28) and date >= datetime.date(2012, 4, 2):
+		fwfs[7] = fwfs[7].ix[:len(fwfs[7])-4, :]
+
+
+	if save_to_csv:
+		fwfs[7].to_csv(SAVE_DIR_NAME + 'csv/table4/' + f_name[:-4] + '_t4.csv',
+			cols=['source', 'url', 'date', 'day', 'table', 'item', 'is_total', 'today', 'mtd', 'fytd'],
+			index=False)
+
+
+
+
+
+
 
 
 
