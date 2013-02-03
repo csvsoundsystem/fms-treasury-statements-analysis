@@ -64,11 +64,11 @@ frame <- function(i) {
     }
     plot(
         table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
-        type = 'l',
+        type = 'n',
         xlim = range(table2.toplot$date),
         ylim = range(table2.toplot$balance),
         xlab = '', #Date
-        ylab = 'Cash in the bank', main = 'FMS Soundsystem',
+        ylab = 'Cash in the bank (millions)', main = 'FMS Soundsystem',
         axes = F, col = 2
     )
     polygon(
@@ -78,12 +78,12 @@ frame <- function(i) {
     )
     text(
         x = max(table2.toplot$date),
-        y = c(0, 3000) + mean(range(table2.toplot$balance)),
+        y = c(3000, 0) + mean(range(table2.toplot$balance)),
         labels = c(
-            sub('\\$-', '-$', paste('$', as.character(table2.toplot[i,'balance']), sep = '')),
-            strftime(table2.toplot[i,'date'], format = '%B %Y')
+            strftime(table2.toplot[i,'date'], format = '%B %Y'),
+            sub('\\$-', '-$', paste('$', as.character(table2.toplot[i,'balance']), ' million', sep = ''))
         ),
-        pos = 2
+        pos = 2, font = 2:1
 
     )
   # axis(1, at = range(table2.toplot$date), labels = range(table2.toplot$date))
@@ -92,7 +92,7 @@ frame <- function(i) {
         x = table2.toplot[i,'date'],
         y = table2.toplot[i,'balance'],
         height = abs(diff(range(table2.toplot$balance))) / 5,
-        width = abs(diff(range(table2.toplot$date))) / 5,
+        width = abs(diff(range(table2.toplot$date))) / 10,
         labels = ''
     )
   # print(table2.toplot[i,])
