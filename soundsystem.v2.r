@@ -50,7 +50,7 @@ face <- function(day.or.days, x, y, ...) {
     dimnames(f$xy) <- dimnames(f.all$xy)
     f$faces <-f.all$faces[day.or.days]
 
-    x.pos <- x + abs(diff(range(table2.toplot$date)) / 10)
+    x.pos <- x + abs(diff(range(table2.toplot$date)) / 20)
 
     plot.faces(f, face.type = 1, x.pos = x.pos, y.pos = y, ...)
 }
@@ -98,7 +98,7 @@ frame <- function(i) {
         table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
         type = 'n',
         xlim = range(table2.toplot$date),
-        ylim = c(-2e6, 7e6), #range(table2.toplot$balance),
+        ylim = c(-2e5, 7e5), #range(table2.toplot$balance),
         xlab = '', #Date
         ylab = 'Cash in the bank (millions)', main = '', #'FMS Soundsystem',
         axes = F, col = 2
@@ -156,7 +156,7 @@ frame <- function(i) {
 
 main.plots <- function() {
     for (i in 1:nrow(table2.toplot)) {
-         png(sprintf('slideshow/%04d.png', i), width = 1200, height = 600) 
+         png(sprintf('slideshow/%d.png', i), width = 1200, height = 600) 
          frame(i)
          dev.off()
     }
