@@ -1,0 +1,24 @@
+library("hiR")
+library("reshape2")
+library("plyr")
+library("lme4")
+setwd("/Users/brian/Dropbox/code/fms-treasury-statements-analysis")
+add table2.csv
+df <- read.csv("table2.csv", stringsAsFactors=F)
+df <- df[df$is_total==0, ]
+df$total[df$type=="withdrawal"] <- df$total * -1
+added table3a.csv
+df_total <- read.csv("table3a.csv", stringsAsFactors=F)
+head(df_total, 40)
+df_debt <- df_total[df_total$item=="Net Change in Public Debt Outstanding",]
+df_debt <- df_debt[, c("today", "date")]
+names(df_debt) <- c("debt", "date")
+join data
+a <- join(df_debt, df, by="date", type="right")
+a$date <- as.Date(a$date)
+a$today <- as.numeric(a$today)
+a$item <- as.factor(a$item)
+m1 <- glm(debt ~ today + item, data=a)
+summary(m1)
+table(a$debt, a$item)
+table(a$item)
