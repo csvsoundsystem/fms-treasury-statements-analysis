@@ -36,16 +36,23 @@ pca.stuff <- function() {
 }
 factored <- t(scale(items, center = pca$center, scale = pca$scale) %*% pca$loadings)
 
+# Make faces
+f <- faces(t(factored)[,1:15], plot = F, print.info = F)
+
 # Plot a Chernoff face for a day at an x, y
-face <- function(day.or.days, ...) {
-    # Day is a row index
-    f <- faces(t(factored)[day.or.days,1:15], face.type = 0, plot = F)
-    plot.faces(f, face.type = 0, ...,)
+face <- function(day.or.days, x, y, ...) {
+    # day.or.days is a row index
+    x.pos <- y.pos <- rep(-1e10, ncol(factored))
+    x.pos[day.or.days] <- x
+    y.pos[day.or.days] <- y
+    plot.faces(f, face.type = 1, x.pos = x.pos, y.pos = y.pos, ...)
 }
 
+# Other plot stuff
 table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = var(df$today)) })
 table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])
 
+# Video frame
 frame <- function(i) {
     if (i <= 2) {
         return
@@ -67,13 +74,13 @@ frame <- function(i) {
   # axis(1, at = range(table2.toplot$date), labels = range(table2.toplot$date))
     axis(2)
     face(i,
-        x.pos = table2.toplot[i,'date'],
-        y.pos = table2.toplot[i,'balance'],
+        x = table2.toplot[i,'date'],
+        y = table2.toplot[i,'balance'],
         height = abs(diff(range(table2.toplot$balance))) / 5,
         width = abs(diff(range(table2.toplot$date))) / 5,
         labels = ''
     )
-    print(table2.toplot[i,])
+  # print(table2.toplot[i,])
 }
 
 frame(30)
