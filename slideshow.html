@@ -14,15 +14,24 @@
     <body>
         <canvas id="canvas" width=1200" height="600"></canvas>
         <script>
-        var canvas = document.getElementById('canvas');
-        var context = canvas.getContext('2d');
+        var n = 1917
+        n = 10
+        for (var i = n, rowNums = []; i--;) rowNums.push(i);
+        rowNums.pop()
+        rowNums.reverse()
 
-        for (var i=1917, a=[]; i--;) a.push(i);
-        a.reverse()
+        var images = rowNums.map(function(i) {
+            var img = new Image()
+            img.src = 'slideshow/' + i + '.png'
+            return img
+        })
 
-        var i = new Image();
-        i = '.png';
-
+        var go = function() {
+            var canvas = document.getElementById('canvas')
+            var context = canvas.getContext('2d')
+            context.drawImage(images[1], 0, 0)
+        }
+        setTimeout(go, 5000)
         </script>
     </body>
 </html>
