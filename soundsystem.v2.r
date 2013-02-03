@@ -62,7 +62,7 @@ frame <- function(i) {
         type = 'l', lwd = table2.toplot[1:i,'error'] / 1e7,
         xlim = range(table2.toplot$date),
         ylim = range(table2.toplot$balance),
-      # xlab = 'Date',
+        xlab = '', #Date
         ylab = 'Cash in the bank', main = 'FMS Soundsystem',
         axes = F
     )
