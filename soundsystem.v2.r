@@ -16,9 +16,6 @@ if (!'table2.raw' %in% ls()) {
 }
 table2 <- table2.raw[!table2.raw$is_total,c('date', 'type', 'item', 'today')]
 
-# Make faster
-# table2 <- table2[table2$date > as.Date('2012-11-02'),]
-
 # Select only the items that are present on all days.
 n.days <- length(unique(table2$date))
 table2.pca <- ddply(table2, c('type', 'item'), function(df) {
@@ -100,7 +97,7 @@ frame <- function(i) {
         xlim = range(table2.toplot$date),
         ylim = c(-2e5, 7e5), #range(table2.toplot$balance),
         xlab = '', #Date
-        ylab = 'Cash in the bank (millions)', main = '', #'FMS Soundsystem',
+        ylab = 'Cash in the bank (billions)', main = '', #'FMS Soundsystem',
         axes = F, col = 2
     )
     polygon(
@@ -113,35 +110,22 @@ frame <- function(i) {
         xleft =   weighted.mean(range(table2.toplot$date), c(3, 18)),
         ybottom = mean(range(table2.toplot$balance)) * 0.95,
         xright =  max(table2.toplot$date),
-        ytop    = mean(range(table2.toplot$balance)) * 1.1,
+        ytop    = mean(range(table2.toplot$balance)) * 1.15,
         col = 1
-    )
-    # Under main
-    rect(
-        xleft   = min(table2.toplot$date),
-        ybottom = weighted.mean(range(table2.toplot$balance), c(1, 10)),
-        xright  = weighted.mean(range(table2.toplot$date), c(9, 2)),
-        ytop    = max(table2.toplot$balance),
-        col = 1
-    )
-    text(
-        x = weighted.mean(range(table2.toplot$date), c(9, 1)),
-        y = weighted.mean(range(table2.toplot$balance), c(1, 15)),
-        labels = 'FMS Soundsystem',
-        col = fg, pos = 3, font = 2
     )
     text(
         x = max(table2.toplot$date),
-        y = mean(range(table2.toplot$balance)) * c(1.05, 1),
+        y = mean(range(table2.toplot$balance)) * c(1.1, 1),
         labels = c(
             strftime(table2.toplot[i,'date'], format = '%B %Y'),
-            sub('\\$-', '-$', paste('$', as.character(table2.toplot[i,'balance']), ' million', sep = ''))
+            sub('\\$-', '-$', paste('$', as.character(table2.toplot[i,'balance'] / 1000), ' billion', sep = ''))
         ),
         pos = 2, font = 2:1, col = fg
 
     )
-  # axis(1, at = range(table2.toplot$date), labels = range(table2.toplot$date))
-    axis(2)
+    ticks <- seq(-2e-5, 6e5, 1e5)
+    axis(1, at = ticks, labels = ticks / 1000, crt = 90)
+    # axis(2)
     face(i,
         x = table2.toplot[i,'date'],
         y = table2.toplot[i,'balance'],
