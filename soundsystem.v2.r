@@ -13,6 +13,8 @@ if (!'table2.raw' %in% ls()) {
     table2.raw$today <- as.numeric(table2.raw$today)
 
     source('data.r')
+    fed.rate <- read.csv('fed_rate.csv', stringsAsFactors = F)
+    fed.rate$date <- strptime(fed.rate$date, format = '%m/%d/%y')
 }
 table2 <- table2.raw[!table2.raw$is_total,c('date', 'type', 'item', 'today')]
 
@@ -54,7 +56,7 @@ face <- function(day.or.days, x, y, ...) {
 
 # Other plot stuff
 table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = sd(df$today)) })
-table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])
+table2.toplot <- join(join(table2.tmp, fms.day[c('date', 'balance')]), fed.rate)
 
 # Remove NAs
 table2.toplot[c(358, 833, 1022, 1393, 1398),] <- table2.toplot[c(358, 833, 1022, 1393, 1398) - 1,]
