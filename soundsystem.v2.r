@@ -119,10 +119,27 @@ frame <- function(i) {
         y = mean(range(table2.toplot$balance)) * c(1.1, 1),
         labels = c(
             strftime(table2.toplot[i,'date'], format = '%B %Y'),
-            sub('\\$-', '-$', paste('$', as.character(table2.toplot[i,'balance'] / 1000), ' billion', sep = ''))
+            sub('\\$-', '-$', paste('$', as.character(round(table2.toplot[i,'balance'] / 1000)), ' billion', sep = ''))
         ),
         pos = 2, font = 2:1, col = fg
     )
+
+    # Under main
+    rect(
+        xleft   = min(table2.toplot$date),
+        ybottom = weighted.mean(range(table2.toplot$balance), c(1, 10)),
+        xright  = weighted.mean(range(table2.toplot$date), c(9, 2)),
+        ytop    = max(table2.toplot$balance),
+        ytop    = mean(range(table2.toplot$balance)) * 1.15,
+        col = 1
+    )
+    text(
+        x = weighted.mean(range(table2.toplot$date), c(9, 1)),
+        y = weighted.mean(range(table2.toplot$balance), c(1, 15)),
+        labels = 'FMS Soundsystem',
+        col = fg, pos = 3, font = 2
+    )
+
     ticks <- seq(-2e5, 6e5, 1e5)
     axis(2, at = ticks, labels = round(ticks / 1000))
     face(i,
