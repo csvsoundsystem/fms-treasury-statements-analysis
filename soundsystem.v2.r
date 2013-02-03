@@ -100,6 +100,7 @@ frame <- function(i) {
         ylab = 'Cash in the bank (billions)', main = '', #'FMS Soundsystem',
         axes = F, col = 2
     )
+    abline(h = 0, col = fg)
     polygon(
         c(table2.toplot[1:i,'date'], table2.toplot[i:1,'date']),
         c(table2.toplot[1:i,'balance'], table2.toplot[i:1,'balance']) + c(table2.toplot[1:i,'error'], - table2.toplot[i:1,'error']),
@@ -121,11 +122,9 @@ frame <- function(i) {
             sub('\\$-', '-$', paste('$', as.character(table2.toplot[i,'balance'] / 1000), ' billion', sep = ''))
         ),
         pos = 2, font = 2:1, col = fg
-
     )
-    ticks <- seq(-2e-5, 6e5, 1e5)
-    axis(1, at = ticks, labels = ticks / 1000, crt = 90)
-    # axis(2)
+    ticks <- seq(-2e5, 6e5, 1e5)
+    axis(2, at = ticks, labels = round(ticks / 1000))
     face(i,
         x = table2.toplot[i,'date'],
         y = table2.toplot[i,'balance'],
@@ -133,7 +132,6 @@ frame <- function(i) {
         width = abs(diff(range(table2.toplot$date))) / 10,
         labels = ''
     )
-  # print(table2.toplot[i,])
 }
 
 # frame(30)

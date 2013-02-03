@@ -20,17 +20,18 @@
         rowNums.pop()
         rowNums.reverse()
 
-        var images = rowNums.map(function(i) {
-            var img = new Image()
-            img.src = 'slideshow/' + i + '.png'
-            return img
-        })
+//      var images = rowNums.map(function(i) {
+//          var img = new Image()
+//          img.src = 'slideshow/' + i + '.png'
+//          return img
+//      })
 
-        var go = function() {
-            var canvas = document.getElementById('canvas')
-            var context = canvas.getContext('2d')
-            context.drawImage(images[1], 0, 0)
-        }
+//      var go = function() {
+//          var canvas = document.getElementById('canvas')
+//          var context = canvas.getContext('2d')
+//          context.drawImage(images[1], 0, 0)
+//      }
+
         setTimeout(go, 5000)
         </script>
     </body>
