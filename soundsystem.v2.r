@@ -37,17 +37,17 @@ pca.stuff <- function() {
 factored <- t(scale(items, center = pca$center, scale = pca$scale) %*% pca$loadings)
 
 # Plot a Chernoff face for a day at an x, y
-face <- function(day.or.days, x.pos, y.pos) {
+face <- function(day.or.days, ...) {
     # Day is a row index
-    f <- faces(t(factored)[day.or.days,1:15], face.type = 2, plot = F)
-    plot.faces(f, x.pos = x.pos, y.pos = y.pos, face.type = 2, width = 20, height = 20 * 1.6)
+    f <- faces(t(factored)[day.or.days,1:15], face.type = 0, plot = F)
+    plot.faces(f, face.type = 0, ...,)
 }
 
 table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = sd(df$today)) })
 table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])
 
 frame <- function(i) {
-    if (i == 1) {
+    if (i <= 2) {
         return
     }
     plot(
@@ -56,7 +56,12 @@ frame <- function(i) {
         xlim = range(table2.toplot$date),
         ylim = range(table2.toplot$balance)
     )
-    face(i, table2.toplot[i,'date'], table2.toplot[i, 'balance'])
+    face(i,
+        x.pos = table2.toplot[i,'date'],
+        y.pos = table2.toplot[i,'balance'],
+        height = abs(diff(range(table2.toplot$balance))) / 5,
+        width = abs(diff(range(table2.toplot$date))) / 5
+    )
     print(table2.toplot[i,])
 }
 
