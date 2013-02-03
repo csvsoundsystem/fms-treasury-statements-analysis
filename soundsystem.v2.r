@@ -43,7 +43,7 @@ face <- function(day.or.days, ...) {
     plot.faces(f, face.type = 0, ...,)
 }
 
-table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = sd(df$today)) })
+table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = var(df$today)) })
 table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])
 
 frame <- function(i) {
@@ -52,15 +52,26 @@ frame <- function(i) {
     }
     plot(
         table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
-        type = 'l', lwd = table2.toplot[1:i,'error'] / 4000,
+        type = 'l', lwd = table2.toplot[1:i,'error'] / 1e7,
         xlim = range(table2.toplot$date),
-        ylim = range(table2.toplot$balance)
+        ylim = range(table2.toplot$balance),
+      # xlab = 'Date',
+        ylab = 'Cash in the bank', main = 'FMS Soundsystem',
+        axes = F
     )
+    text(
+        x = weighted.mean(range(table2.toplot$date), c(0.1, 0.9)),
+        y = mean(range(table2.toplot$balance)),
+        labels = strftime(table2.toplot[i,'date'], format = '%B %Y')
+    )
+  # axis(1, at = range(table2.toplot$date), labels = range(table2.toplot$date))
+    axis(2)
     face(i,
         x.pos = table2.toplot[i,'date'],
         y.pos = table2.toplot[i,'balance'],
         height = abs(diff(range(table2.toplot$balance))) / 5,
-        width = abs(diff(range(table2.toplot$date))) / 5
+        width = abs(diff(range(table2.toplot$date))) / 5,
+        labels = ''
     )
     print(table2.toplot[i,])
 }
