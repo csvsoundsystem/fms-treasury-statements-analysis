@@ -55,7 +55,8 @@ face <- function(day.or.days, x, y, ...) {
 
 # Other plot stuff
 table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = sd(df$today)) })
-table2.toplot <- na.omit(join(table2.tmp, fms.day[c('date', 'balance')]))
+#table2.toplot <- na.omit(join(table2.tmp, fms.day[c('date', 'balance')]))
+table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])[-(1:40),]
 
 # Video frame
 bg.of.week <- c(
@@ -124,7 +125,7 @@ frame <- function(i) {
     )
     text(
         x = max(table2.toplot$date),
-        y = mean(range(table2.toplot$balance)) * c(1, 1.05),
+        y = mean(range(table2.toplot$balance)) * c(1.05, 1),
         labels = c(
             strftime(table2.toplot[i,'date'], format = '%B %Y'),
             sub('\\$-', '-$', paste('$', as.character(table2.toplot[i,'balance']), ' million', sep = ''))
