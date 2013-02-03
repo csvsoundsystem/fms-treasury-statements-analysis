@@ -33,10 +33,32 @@ pca.stuff <- function() {
     plot(pca$sdev ~ I(1:length(pca$sdev)))
 }
 factored <- t(scale(items, center = pca$center, scale = pca$scale) %*% pca$loadings)
-names(factored) <- names(items)
 
+# Plot a Chernoff face for a day at an x, y
 face <- function(day.or.days, x.pos, y.pos) {
     # Day is a row index
-    f <- faces(t(factored)[day.or.days,1:15], face.type = 0, plot = F)
-    plot.faces(f, x.pos = x.pos, y.pos = y.pos, face.type = 0, width = 20, height = 20 * 1.6)
+    f <- faces(t(factored)[day.or.days,1:15], face.type = 2, plot = F)
+    plot.faces(f, x.pos = x.pos, y.pos = y.pos, face.type = 2, width = 20, height = 20 * 1.6)
+}
+
+table2.tmp <- table2.pca
+balance.at.start <- 8035
+table2.tmp[table2.tmp$type == 'withdrawal','today'] <- -table2.tmp[table2.tmp$type == 'withdrawal','today']
+table2.tmp <- table2.tmp[order(table2.tmp$date),]
+table2.tmp$balance <- cumsum(table2.tmp$today) + balance.at.start
+table2.toplot <- ddply(table2.tmp, 'date', function(df) { c(balance = mean(df$balance), error = sd(df$today)) })
+# rownames(factored) <- rownames(table2.toplot) <- table2.toplot$date
+
+frame <- function(i) {
+    if (i == 1) {
+        return
+    }
+    plot(
+        table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
+        type = 'l', cex = table2.toplot[1:i,'error'],
+        xlim = range(table2.toplot$date),
+        ylim = c(0, max(table2.toplot$balance))
+    )
+    face(i, table2.toplot[i,'date'], table2.toplot[i, 'balance'])
+    print(table2.toplot[i,])
 }
