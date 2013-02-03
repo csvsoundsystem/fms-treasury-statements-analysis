@@ -62,6 +62,7 @@ frame <- function(i) {
     if (i <= 2) {
         return
     }
+    par(bg = '#FFDDDD')
     plot(
         table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
         type = 'n',
