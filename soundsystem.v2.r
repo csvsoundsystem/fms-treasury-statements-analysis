@@ -17,7 +17,7 @@ if (!'table2.raw' %in% ls()) {
 table2 <- table2.raw[!table2.raw$is_total,c('date', 'type', 'item', 'today')]
 
 # Make faster
-table2 <- table2[table2$date > as.Date('2012-11-02'),]
+# table2 <- table2[table2$date > as.Date('2012-11-02'),]
 
 # Select only the items that are present on all days.
 n.days <- length(unique(table2$date))
@@ -55,7 +55,7 @@ face <- function(day.or.days, x, y, ...) {
 
 # Other plot stuff
 table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = sd(df$today)) })
-table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])
+table2.toplot <- na.omit(join(table2.tmp, fms.day[c('date', 'balance')]))
 
 # Video frame
 bg.of.week <- c(
@@ -144,4 +144,12 @@ frame <- function(i) {
   # print(table2.toplot[i,])
 }
 
-frame(30)
+# frame(30)
+
+main.plots <- function() {
+    for (i in 1:nrow(table2.toplot)) {
+         png(sprintf('slideshow/%04d.png', i), width = 1200, height = 600) 
+         frame(i)
+         dev.off()
+    }
+}
