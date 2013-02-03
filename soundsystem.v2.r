@@ -50,13 +50,20 @@ face <- function(day.or.days, x, y, ...) {
     dimnames(f$xy) <- dimnames(f.all$xy)
     f$faces <-f.all$faces[day.or.days]
 
-    plot.faces(f, face.type = 1, x.pos = x, y.pos = y, ...)
+    x.pos <- x + abs(diff(range(table2.toplot$date)) / 10)
+
+    plot.faces(f, face.type = 1, x.pos = x.pos, y.pos = y, ...)
 }
 
 # Other plot stuff
 table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = sd(df$today)) })
-#table2.toplot <- na.omit(join(table2.tmp, fms.day[c('date', 'balance')]))
-table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])[-(1:40),]
+table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])
+
+# Remove NAs
+table2.toplot[c(358, 833, 1022, 1393, 1398),] <- table2.toplot[c(358, 833, 1022, 1393, 1398) - 1,]
+
+# Skip the top 40 for rolling.
+table2.toplot <- table2.toplot[-(1:40),]
 
 # Video frame
 bg.of.week <- c(
@@ -91,7 +98,7 @@ frame <- function(i) {
         table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
         type = 'n',
         xlim = range(table2.toplot$date),
-        ylim = range(table2.toplot$balance),
+        ylim = c(-2e6, 7e6), #range(table2.toplot$balance),
         xlab = '', #Date
         ylab = 'Cash in the bank (millions)', main = '', #'FMS Soundsystem',
         axes = F, col = 2
