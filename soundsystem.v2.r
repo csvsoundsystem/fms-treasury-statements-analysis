@@ -37,15 +37,20 @@ pca.stuff <- function() {
 factored <- t(scale(items, center = pca$center, scale = pca$scale) %*% pca$loadings)
 
 # Make faces
-f <- faces(t(factored)[,1:15], plot = F, print.info = F)
+f.all <- faces(t(factored)[,1:15], plot = F, print.info = F)
 
 # Plot a Chernoff face for a day at an x, y
 face <- function(day.or.days, x, y, ...) {
     # day.or.days is a row index
-    x.pos <- y.pos <- rep(-1e10, ncol(factored))
-    x.pos[day.or.days] <- x
-    y.pos[day.or.days] <- y
-    plot.faces(f, face.type = 1, x.pos = x.pos, y.pos = y.pos, ...)
+
+    f <- f.all
+    f$xy <- f$faces <- NULL
+
+    f$xy <- matrix(f.all$xy[,day.or.days])
+    dimnames(f$xy) <- dimnames(f.all$xy)
+    f$faces <-f.all$faces[day.or.days]
+
+    plot.faces(f, face.type = 1, x.pos = x, y.pos = y, ...)
 }
 
 # Other plot stuff
