@@ -4,6 +4,12 @@ library(plyr)
 table2.raw <- read.csv('table2-std.csv')
 table2 <- table2.raw[!table2.raw$is_total,c('date', 'type', 'item', 'today')]
 
+# Fix types
+table2$date <- as.Date(table2$date)
+table2$type <- factor(table2$type)
+table2$item <- factor(table2$item)
+table2$today <- as.numeric(table2$today)
+
 # Make faster
 table2 <- table2[1:1000,]
 
@@ -17,4 +23,4 @@ table2 <- ddply(table2, c('type', 'item'), function(df) {
 
 # Run PCA
 
-#items <- dcast(table2, date ~ type + item, value.var = 'today', fun.aggregate = mean)[-1]
+items <- dcast(table2, date ~ type + item, value.var = 'today')[-1]
