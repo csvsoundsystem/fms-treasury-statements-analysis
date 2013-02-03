@@ -157,7 +157,11 @@ frame <- function(i) {
     )
 
     par(new = T)
-    plot(table2.toplot$rate ~ table2.toplot$date, axes = F, xlab = '', ylab = '')
+    plot(
+         table2.toplot[1:i,'rate'] ~ table2.toplot[1:i,'date'],
+         axes = F, xlab = '', ylab = '', type = 'l',
+         xlim = range(table2.toplot$date), ylim = c(0, max(table2.toplot$rate))
+    )
     mtext("Federal interest rate (%)", side=4, line=3)
     axis(4)
 }
