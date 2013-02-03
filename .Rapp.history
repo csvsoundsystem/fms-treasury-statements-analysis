@@ -1,24 +1,250 @@
-library("hiR")
-library("reshape2")
-library("plyr")
-library("lme4")
-setwd("/Users/brian/Dropbox/code/fms-treasury-statements-analysis")
-add table2.csv
-df <- read.csv("table2.csv", stringsAsFactors=F)
-df <- df[df$is_total==0, ]
-df$total[df$type=="withdrawal"] <- df$total * -1
-added table3a.csv
-df_total <- read.csv("table3a.csv", stringsAsFactors=F)
-head(df_total, 40)
-df_debt <- df_total[df_total$item=="Net Change in Public Debt Outstanding",]
-df_debt <- df_debt[, c("today", "date")]
-names(df_debt) <- c("debt", "date")
-join data
-a <- join(df_debt, df, by="date", type="right")
-a$date <- as.Date(a$date)
-a$today <- as.numeric(a$today)
-a$item <- as.factor(a$item)
-m1 <- glm(debt ~ today + item, data=a)
-summary(m1)
-table(a$debt, a$item)
-table(a$item)
+})
+d_yr_item  <- d_yr_item[order(w_yr_item$V1),]
+head(d_yr_item, 100)
+d_yr_item  <- d_yr_item[order(w_yr_item$sum),]
+head(d_yr_item, 100)
+d_yr_item  <- d_yr_item[order(d_yr_item$sum),]
+head(d_yr_item, 100)
+head(d_yr_item, 10000)
+d_yr_item  <- d_yr_item[order(d_yr_item$sum, d_yr_item$year),]
+head(d_yr_item, 10000)
+d <- read.csv("/Users/brian/Dropbox/code/fms-treasury-statements-analysis/music_data.csv", stringsAsFactors=F)
+d <- read.csv("/Users/brian/Dropbox/code/fms-treasury-statements-analysis/music_data.csv", stringsAsFactors=F)
+head(d)
+seq(from=d$date[1], to=d$date[nrow(d), by=day])
+seq(from=d$date[1], to=d$date[nrow(d)], by=day])
+d$date[nrow(d)]
+dates <- seq(from=as.Date(d$date[1]), to=as.Date(d$date[nrow(d)]), by=day])
+dates <- seq(from=as.Date(d$date[1]), to=as.Date(d$date[nrow(d)]), by=day)
+dates <- seq(from=as.Date(d$date[1]), to=as.Date(d$date[nrow(d)]), by="day")
+dates
+join_df <- data.frame(date=dates)
+d <- join(d, join_df, type="right", by="date")
+head(d)
+d[is.na(d)] <- 0
+head(d)
+bass <- saw(C3, bpmTime(bpm, "four_"))
+library("tuneR")
+bass <- saw(C3, bpmTime(bpm, "four_"))
+bass <- Saw(C3, bpmTime(bpm, "four_"))
+bass <- Square(C3, bpmTime(bpm, "four_"))
+bass <- sawtooth(C3, bpmTime(bpm, "four_"))
+' various helper functions for generating chords
+'
+' @param base a base note for the chord
+' @param bpm a desired bpm
+' @param count the count of the chord
+' @param tuning what tuning should the chord use
+' @param unit the bit rate to sample with.
+'
+' @return
+' a chopped wave
+'
+' @export
+'
+' @examples
+' #not run
+bpmTime <- function(bpm=120, count="all"){
+options(digits=10)
+onebar = (60/bpm)*4
+key  =  list(
+thirtytwo = onebar*32,
+sixteen = onebar*16,
+twelve = onebar*12,
+eight = onebar*8,
+six = onebar*6,
+four = onebar*4,
+three = onebar*3,
+two = onebar*2,
+one = onebar,
+two_ = onebar/2,
+three_ = onebar/3,
+four_ = onebar/4,
+six_ = onebar/6,
+eight_ = onebar/8,
+twelve_ = onebar/12,
+sixteen_ = onebar/16,
+thirtytwo_ = onebar/32
+)
+if(count=="all"){
+return(key)
+} else {
+return(as.numeric(key[count]))
+}
+}
+maj <- function(base, bpm=bpm, count="four", tuning = '12tet', unit = '16')
+{
+if(missing(bpm)){
+stop("You must set bpm")
+}
+time = bpmTime(bpm,count)
+chord = sine(base, duration=time, xunit="time") +
+sine(interval('major-third',
+tuning = tuning)* base,
+duration= time,
+xunit="time")  +
+sine(interval('perfect-fifth',
+tuning = tuning) * base,
+duration= time,
+xunit="time")
+chord <- prepComb(normalize(chord, unit=unit))
+return(chord)
+}
+min <- function(base, bpm=bpm, count="four", tuning = '12tet', unit = '16')
+{
+if(missing(bpm)){
+stop("please set bpm")
+}
+time = bpmTime(bpm,count)
+chord <-  sine(base, duration= time, xunit="time") +
+sine(interval('minor-third',
+tuning = tuning) * base,
+duration= time,
+xunit="time") +
+sine(interval('perfect-fifth',
+tuning = tuning) * base,
+duration= time,
+xunit="time")
+chord <- prepComb(normalize(chord, unit=unit))
+return(chord)
+}
+dim <- function(base, bpm=bpm, count="four", tuning = '12tet', unit = '16')
+{
+if(missing(bpm)){
+stop("please set bpm")
+}
+time = bpmTime(bpm,count)
+chord <-  sine(base, duration= time, xunit="time") +
+sine(interval('major-third',
+tuning = tuning) * base,
+duration= time,
+xunit="time") +
+sine(interval('diminished-fifth',
+tuning = tuning) * base,
+duration= time,
+xunit="time")
+chord <- prepComb(normalize(chord, unit=unit))
+return(chord)
+}
+aug <- function(base, bpm=bpm, count="four", tuning = '12tet', unit = '16')
+{
+if(missing(bpm)){
+stop("please set bpm")
+}
+time = bpmTime(bpm,count)
+chord <-  sine(base, duration= time, xunit="time") +
+sine(interval('major-third',
+tuning = tuning) * base,
+duration= time,
+xunit="time") +
+sine(interval('minor-sixth',
+tuning = tuning) * base,
+duration= time,
+xunit="time")
+chord <- prepComb(normalize(chord, unit=unit))
+return(chord)
+}
+susp2 <- function(base, bpm=bpm, count="four", tuning = '12tet', unit = '16')
+{
+if(missing(bpm)){
+stop("please set bpm")
+}
+time = bpmTime(bpm,count)
+chord <-  sine(base, duration= time, xunit="time") +
+sine(interval('major-second',
+tuning = tuning) * base,
+duration= time,
+xunit="time") +
+sine(interval('perfect-fifth',
+tuning = tuning) * base,
+duration= time,
+xunit="time")
+chord <- prepComb(normalize(chord, unit=unit))
+return(chord)
+}
+susp4 <- function(base, bpm=bpm, count="four", tuning = '12tet', unit = '16')
+{
+if(missing(bpm)){
+stop("please set bpm")
+}
+time = bpmTime(bpm,count)
+chord <-  sine(base, duration= time, xunit="time") +
+sine(interval('perfect-fourth',
+tuning = tuning) * base,
+duration= time,
+xunit="time") +
+sine(interval('perfect-fifth',
+tuning = tuning) * base,
+duration= time,
+xunit="time")
+chord <- prepComb(normalize(chord, unit=unit))
+return(chord)
+}
+maj7 <- function(base, bpm=bpm, count="four", tuning = '12tet', unit = '16')
+{
+if(missing(bpm)){
+stop("please set bpm")
+}
+time <- bpmTime(bpm,count)
+chord <-  sine(base, duration= time, xunit="time") +
+sine(interval('major-third',
+tuning = tuning) * base,
+duration= time,
+xunit="time") +
+sine(interval('perfect-fifth',
+tuning = tuning) * base,
+duration= time,
+xunit="time") +
+sine(interval('major-seventh',
+tuning = tuning) * base,
+duration= time,
+xunit="time")
+chord <- prepComb(normalize(chord, unit=unit))
+return(chord)
+}
+min7 <- function(base, bpm=bpm, count="four", tuning = '12tet', unit = '16')
+{
+if(missing(bpm)){
+stop("please set bpm")
+}
+time = bpmTime(bpm,count)
+chord <-  sine(base, duration= time, xunit="time") +
+sine(interval('minor-third',
+tuning = tuning) * base,
+duration= time,
+xunit="time") +
+sine(interval('perfect-fifth',
+tuning = tuning) * base,
+duration= time,
+xunit="time") +
+sine(interval('minor-seventh',
+tuning = tuning) * base,
+duration= time,
+xunit="time")
+chord <- prepComb(normalize(chord, unit=unit))
+return(chord)
+}
+bass <- sawtooth(C3, bpmTime(bpm, "four_"))
+bpm <- 280
+bass <- sawtooth(C3, bpmTime(bpm, "four_"))
+f <- read.csv("/Users/brian/Dropbox/code/fms-treasury-statements-analysis/fed_data.csv", stringsAsFactors=F)
+f <- read.csv("/Users/brian/Dropbox/code/fms-treasury-statements-analysis/fed_rate.csv", stringsAsFactors=F)
+require("tuneR")
+notes <- read.csv("/Users/brian/Dropbox/code/soundsystem/data/notes.csv", stringsAsFactors=F)
+notes
+notes <- read.csv("/Users/brian/Dropbox/code/soundsystem/data/notes.csv", stringsAsFactors=F)
+attach(notes)
+f <- read.csv("/Users/brian/Dropbox/code/fms-treasury-statements-analysis/fed_rate.csv", stringsAsFactors=F)
+head(f)
+library("lubridate")
+f$date <- dmy(f$date)
+f <- read.csv("/Users/brian/Dropbox/code/fms-treasury-statements-analysis/fed_rate.csv", stringsAsFactors=F)
+f$date <- mdy(f$date)
+plot(f$date, f$rate, type="l")
+d <- read.csv("/Users/brian/Dropbox/code/fms-treasury-statements-analysis/music_data.csv", stringsAsFactors=F)
+dates <- seq(from=as.Date(d$date[1]), to=as.Date(d$date[nrow(d)]), by="day")
+d <- read.csv("/Users/brian/Dropbox/code/fms-treasury-statements-analysis/music_data.csv", stringsAsFactors=F)
+d$date <- as.Date(d$date)
+d <- join(f, d, type="right", by="date")
+head(d)
+d$X <- NULL
