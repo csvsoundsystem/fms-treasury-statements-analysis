@@ -58,7 +58,7 @@ table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = sd(df$today)) }
 table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])
 
 # Video frame
-colors.of.week <- c(
+bg.of.week <- c(
   Sunday = '#DDDDDD',
   Monday = '#FFDDDD',
   Tuesday = '#DDFFDD',
@@ -67,19 +67,32 @@ colors.of.week <- c(
   Friday = '#FFFFDD',
   Saturday = '#FFDDFF'
 )
+fg.of.week <- c(
+  Sunday = '#000000',
+  Monday = '#00DDDD',
+  Tuesday = '#DDDD00',
+  Wednesday = '#DD00DD',
+  Thursday = '#DD0000',
+  Friday = '#00DD00',
+  Saturday = '#0000DD'
+)
 frame <- function(i) {
     if (i <= 2) {
         return
     }
     day.of.week.a <- strftime(table2.toplot[i,'date'], format = '%A')
-    par(bg = colors.of.week[day.of.week.a][[1]])
+    bg <- bg.of.week[day.of.week.a][[1]]
+    fg <- fg.of.week[day.of.week.a][[1]]
+    par(
+        bg = bg
+    )
     plot(
         table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
         type = 'n',
         xlim = range(table2.toplot$date),
         ylim = range(table2.toplot$balance),
         xlab = '', #Date
-        ylab = 'Cash in the bank (millions)', main = 'FMS Soundsystem',
+        ylab = 'Cash in the bank (millions)', main = '', #'FMS Soundsystem',
         axes = F, col = 2
     )
     polygon(
@@ -87,14 +100,36 @@ frame <- function(i) {
         c(table2.toplot[1:i,'balance'], table2.toplot[i:1,'balance']) + c(table2.toplot[1:i,'error'], - table2.toplot[i:1,'error']),
         col = 1
     )
+    # Under month
+    rect(
+        xleft =   weighted.mean(range(table2.toplot$date), c(3, 18)),
+        ybottom = mean(range(table2.toplot$balance)) * 0.95,
+        xright =  max(table2.toplot$date),
+        ytop    = mean(range(table2.toplot$balance)) * 1.1,
+        col = 1
+    )
+    # Under main
+    rect(
+        xleft   = min(table2.toplot$date),
+        ybottom = weighted.mean(range(table2.toplot$balance), c(1, 10)),
+        xright  = weighted.mean(range(table2.toplot$date), c(9, 2)),
+        ytop    = max(table2.toplot$balance),
+        col = 1
+    )
+    text(
+        x = weighted.mean(range(table2.toplot$date), c(9, 1)),
+        y = weighted.mean(range(table2.toplot$balance), c(1, 15)),
+        labels = 'FMS Soundsystem',
+        col = fg, pos = 3, font = 2
+    )
     text(
         x = max(table2.toplot$date),
-        y = c(3000, 0) + mean(range(table2.toplot$balance)),
+        y = mean(range(table2.toplot$balance)) * c(1, 1.05),
         labels = c(
             strftime(table2.toplot[i,'date'], format = '%B %Y'),
             sub('\\$-', '-$', paste('$', as.character(table2.toplot[i,'balance']), ' million', sep = ''))
         ),
-        pos = 2, font = 2:1
+        pos = 2, font = 2:1, col = fg
 
     )
   # axis(1, at = range(table2.toplot$date), labels = range(table2.toplot$date))
