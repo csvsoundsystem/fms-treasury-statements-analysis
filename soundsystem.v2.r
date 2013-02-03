@@ -11,6 +11,8 @@ if (!'table2.raw' %in% ls()) {
     table2.raw$type <- factor(table2.raw$type)
     table2.raw$item <- factor(table2.raw$item)
     table2.raw$today <- as.numeric(table2.raw$today)
+
+    source('data.r')
 }
 table2 <- table2.raw[!table2.raw$is_total,c('date', 'type', 'item', 'today')]
 
@@ -41,13 +43,8 @@ face <- function(day.or.days, x.pos, y.pos) {
     plot.faces(f, x.pos = x.pos, y.pos = y.pos, face.type = 2, width = 20, height = 20 * 1.6)
 }
 
-table2.tmp <- table2.pca
-balance.at.start <- 8035
-table2.tmp[table2.tmp$type == 'withdrawal','today'] <- -table2.tmp[table2.tmp$type == 'withdrawal','today']
-table2.tmp <- table2.tmp[order(table2.tmp$date),]
-table2.tmp$balance <- cumsum(table2.tmp$today) + balance.at.start
-table2.toplot <- ddply(table2.tmp, 'date', function(df) { c(balance = mean(df$balance), error = sd(df$today)) })
-# rownames(factored) <- rownames(table2.toplot) <- table2.toplot$date
+table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = sd(df$today)) })
+table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])
 
 frame <- function(i) {
     if (i == 1) {
@@ -55,10 +52,12 @@ frame <- function(i) {
     }
     plot(
         table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
-        type = 'l', cex = table2.toplot[1:i,'error'],
+        type = 'l', lwd = table2.toplot[1:i,'error'] / 4000,
         xlim = range(table2.toplot$date),
-        ylim = c(0, max(table2.toplot$balance))
+        ylim = range(table2.toplot$balance)
     )
     face(i, table2.toplot[i,'date'], table2.toplot[i, 'balance'])
     print(table2.toplot[i,])
 }
+
+frame(30)
