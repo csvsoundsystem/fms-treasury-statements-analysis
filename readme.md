@@ -46,3 +46,6 @@ And then reduced the now-61-dimensional dataset to an interactive.
 We used principal component analysis to rotate the 52 line-items, and we plotted
 the 15 highest-loaded components as Chernoff faces. We plotted interest rate and
 balance, with an error width.
+
+We represented similar data in audio. We selected chords based on the derivative
+of cash balance, and we composed a melody based on the interest rate.
