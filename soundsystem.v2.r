@@ -103,6 +103,11 @@ frame <- function(i) {
         axes = F, col = 2
     )
     abline(h = 0, col = fg)
+
+    # Rate
+    #range(table2.toplot$balance)
+
+    # Balance
     polygon(
         c(table2.toplot[1:i,'date'], table2.toplot[i:1,'date']),
         c(table2.toplot[1:i,'balance'], table2.toplot[i:1,'balance']) + c(table2.toplot[1:i,'error'], - table2.toplot[i:1,'error']),
@@ -132,7 +137,6 @@ frame <- function(i) {
         ybottom = weighted.mean(range(table2.toplot$balance), c(1, 10)),
         xright  = weighted.mean(range(table2.toplot$date), c(9, 2)),
         ytop    = max(table2.toplot$balance),
-        ytop    = mean(range(table2.toplot$balance)) * 1.15,
         col = 1
     )
     text(
@@ -151,6 +155,11 @@ frame <- function(i) {
         width = abs(diff(range(table2.toplot$date))) / 10,
         labels = ''
     )
+
+    par(new = T)
+    plot(table2.toplot$rate ~ table2.toplot$date, axes = F, xlab = '', ylab = '')
+    mtext("Federal interest rate (%)", side=4, line=3)
+    axis(4)
 }
 
 # frame(30)
