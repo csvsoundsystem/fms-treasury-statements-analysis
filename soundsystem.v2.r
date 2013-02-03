@@ -100,7 +100,7 @@ frame <- function(i) {
         ylim = c(-2e5, 7e5), #range(table2.toplot$balance),
         xlab = '', #Date
         ylab = 'Cash in the bank (billions)', main = '', #'FMS Soundsystem',
-        axes = F, col = 2
+        axes = F, col = 4 # so we notice errors
     )
     abline(h = 0, col = fg)
 
@@ -111,7 +111,7 @@ frame <- function(i) {
     polygon(
         c(table2.toplot[1:i,'date'], table2.toplot[i:1,'date']),
         c(table2.toplot[1:i,'balance'], table2.toplot[i:1,'balance']) + c(table2.toplot[1:i,'error'], - table2.toplot[i:1,'error']),
-        col = 'grey', border = NA
+        col = 1
     )
     # Under month
     rect(
@@ -147,7 +147,7 @@ frame <- function(i) {
     )
 
     ticks <- seq(-2e5, 6e5, 1e5)
-    axis(2, at = ticks, labels = round(ticks / 1000), col = 'grey', col.ticks = 'grey')
+    axis(2, at = ticks, labels = round(ticks / 1000))
     face(i,
         x = table2.toplot[i,'date'],
         y = table2.toplot[i,'balance'],
@@ -159,11 +159,11 @@ frame <- function(i) {
     par(new = T)
     plot(
          table2.toplot[1:i,'rate'] ~ table2.toplot[1:i,'date'],
-         axes = F, xlab = '', ylab = '', type = 'l',
+         axes = F, xlab = '', ylab = '', type = 'l', lty = 2,
          xlim = range(table2.toplot$date), ylim = c(-2, max(table2.toplot$rate))
     )
     mtext("Federal interest rate", side=4, line=3)
-    axis(4, at = 1:5, labels = paste(1:5, '%', sep = ''))
+    axis(4, at = 0:5, labels = paste(0:5, '%', sep = ''), lty = 2)
 }
 
 # frame(30)
