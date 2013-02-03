@@ -113,7 +113,26 @@ frame <- function(i) {
         c(table2.toplot[1:i,'balance'], table2.toplot[i:1,'balance']) + c(table2.toplot[1:i,'error'], - table2.toplot[i:1,'error']),
         col = 1
     )
-    # Under month
+
+    # Under balance
+    rect(
+        xright =  min(table2.toplot$date),
+        ybottom = mean(range(table2.toplot$balance)) * 0.95,
+        xleft =   weighted.mean(range(table2.toplot$date), c(18, 3)),
+        ytop    = mean(range(table2.toplot$balance)) * 1.15,
+        col = 1
+    )
+    text(
+        x = min(table2.toplot$date),
+        y = mean(range(table2.toplot$balance)) * c(1.1, 1),
+        labels = c(
+            'Balance',
+            sub('\\$-', '-$', paste('$', as.character(round(table2.toplot[i,'balance'] / 1000)), ' billion', sep = ''))
+        ),
+        pos = 4, font = 2:1, col = fg
+    )
+
+    # Under interest rate
     rect(
         xleft =   weighted.mean(range(table2.toplot$date), c(3, 18)),
         ybottom = mean(range(table2.toplot$balance)) * 0.95,
@@ -125,7 +144,7 @@ frame <- function(i) {
         x = max(table2.toplot$date),
         y = mean(range(table2.toplot$balance)) * c(1.1, 1),
         labels = c(
-            strftime(table2.toplot[i,'date'], format = '%B %Y'),
+            'Interest rate',
             sub('\\$-', '-$', paste('$', as.character(round(table2.toplot[i,'balance'] / 1000)), ' billion', sep = ''))
         ),
         pos = 2, font = 2:1, col = fg
@@ -133,16 +152,22 @@ frame <- function(i) {
 
     # Under main
     rect(
-        xleft   = min(table2.toplot$date),
-        ybottom = weighted.mean(range(table2.toplot$balance), c(1, 10)),
-        xright  = weighted.mean(range(table2.toplot$date), c(9, 2)),
+        xleft   = weighted.mean(range(table2.toplot$date), c(2, 9)),
+        ybottom = weighted.mean(range(table2.toplot$balance), c(2, 15)),
+        xright  = max(table2.toplot$date),
         ytop    = max(table2.toplot$balance),
         col = 1
     )
     text(
-        x = weighted.mean(range(table2.toplot$date), c(9, 1)),
-        y = weighted.mean(range(table2.toplot$balance), c(1, 15)),
-        labels = 'FMS Soundsystem',
+        x = weighted.mean(range(table2.toplot$date), c(1, 9)),
+        y = c(
+            weighted.mean(range(table2.toplot$balance), c(2, 30)),
+            weighted.mean(range(table2.toplot$balance), c(3, 30))
+        ),
+        labels = c(
+            'FMS Soundsystem',
+            strftime(table2.toplot[i,'date'], format = '%B %Y')
+        ),
         col = fg, pos = 3, font = 2
     )
 
