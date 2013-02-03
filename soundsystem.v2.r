@@ -111,7 +111,7 @@ frame <- function(i) {
     polygon(
         c(table2.toplot[1:i,'date'], table2.toplot[i:1,'date']),
         c(table2.toplot[1:i,'balance'], table2.toplot[i:1,'balance']) + c(table2.toplot[1:i,'error'], - table2.toplot[i:1,'error']),
-        col = fg
+        col = 'grey', border = NA
     )
     # Under month
     rect(
@@ -147,7 +147,7 @@ frame <- function(i) {
     )
 
     ticks <- seq(-2e5, 6e5, 1e5)
-    axis(2, at = ticks, labels = round(ticks / 1000), col = fg, col.ticks = fg)
+    axis(2, at = ticks, labels = round(ticks / 1000), col = 'grey', col.ticks = 'grey')
     face(i,
         x = table2.toplot[i,'date'],
         y = table2.toplot[i,'balance'],
