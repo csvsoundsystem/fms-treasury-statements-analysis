@@ -58,11 +58,21 @@ table2.tmp <- ddply(table2.pca, 'date', function(df) { c(error = sd(df$today)) }
 table2.toplot <- join(table2.tmp, fms.day[c('date', 'balance')])
 
 # Video frame
+colors.of.week <- c(
+  Sunday = '#DDDDDD',
+  Monday = '#FFDDDD',
+  Tuesday = '#DDFFDD',
+  Wednesday = '#DDDDFF',
+  Thursday = '#DDFFFF',
+  Friday = '#FFFFDD',
+  Saturday = '#FFDDFF'
+)
 frame <- function(i) {
     if (i <= 2) {
         return
     }
-    par(bg = '#FFDDDD')
+    day.of.week.a <- strftime(table2.toplot[i,'date'], format = '%A')
+    par(bg = colors.of.week[day.of.week.a][[1]])
     plot(
         table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
         type = 'n',
