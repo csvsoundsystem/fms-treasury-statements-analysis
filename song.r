@@ -53,6 +53,7 @@ scale_vec <- function(x, high, low){
 }
 rate_notes <- scale_vec(d$rate+1, 50, 13) + 12
 
+
 source("soundsystem.R")
 melody <- prepComb(silence(duration=bpmTime(bpm, "one"), xunit="time"))
 for(i in 1:length(rate_notes)) {
@@ -64,6 +65,24 @@ for(i in 1:length(rate_notes)) {
     print(i)
 }
 writeWave(melody, "melody_final.wav")
+
+
+
+debt_notes <- scale_vec(d$dist_to_debt+1, 50, 13) + 12
+
+
+source("soundsystem.R")
+melody <- prepComb(silence(duration=bpmTime(bpm, "one"), xunit="time"))
+for(i in 1:length(rate_notes)) {
+    freq <- as.numeric(white[,rate_notes[i]])
+    sound <- sine(freq, duration=bpmTime(bpm, "four_"), xunit="time")
+    sound <- prepComb(normalize(sound, unit="16"))
+    sound <- chop(sound, bpm, count="four_")
+    melody <- bind(melody, sound)
+    print(i)
+}
+writeWave(melody, "melody_final.wav")
+
 
 # chords
 d$id <- 1:nrow(d)
