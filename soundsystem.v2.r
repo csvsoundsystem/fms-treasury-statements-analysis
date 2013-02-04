@@ -2,6 +2,7 @@ library(plyr)
 library(aplpack)
 library(reshape2)
 library(RJSONIO)
+library(sqldf)
 
 # Load the data
 if (!'table2.raw' %in% ls()) {
@@ -22,6 +23,7 @@ if (!'table2.raw' %in% ls()) {
 links <- sqldf('select date, url from [table2.raw] group by date')[-(1:40),]
 links$dayOfWeek <- strftime(links$date, format = '%A')
 links$date <- strftime(links$date, format = '%A, %B %d, %Y')
+links$url <- sub('dir=w', 'dir=a', links$url)
 json.data <- toJSON(links)
 json.file <- file("data_files.js")
 writeLines(paste('var dataFiles =', json.data), json.file)
