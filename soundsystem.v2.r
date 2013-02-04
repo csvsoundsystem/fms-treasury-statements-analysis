@@ -17,13 +17,15 @@ if (!'table2.raw' %in% ls()) {
     fed.rate <- read.csv('fed_rate.csv', stringsAsFactors = F)
     fed.rate$date <- strptime(fed.rate$date, format = '%m/%d/%y')
 }
-table2 <- table2.raw[!table2.raw$is_total,c('date', 'type', 'item', 'today')]
 
 # Write some data for the website, skipping the top 40 for rolling
-json.data <- toJSON(table2[-(1:40),c('url', 'date')])
+json.data <- toJSON(sqldf('select date, url from [table2.raw] group by date')[-(1:40),])
 json.file <- file("data_files.json")
 writeLines(json.data, json.file)
 close(json.file)
+
+# Remove totals, and select a few columns
+table2 <- table2.raw[!table2.raw$is_total,c('date', 'type', 'item', 'today')]
 
 # Select only the items that are present on all days.
 n.days <- length(unique(table2$date))
