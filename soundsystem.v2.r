@@ -20,11 +20,13 @@ if (!'table2.raw' %in% ls()) {
 
 # Write some data for the website, skipping the top 40 for rolling
 links <- sqldf('select date, url from [table2.raw] group by date')[-(1:40),]
-links$date <- strftime(links$date, format = '%B %d, %Y')
+links$dayOfWeek <- strftime(links$date, format = '%A')
+links$date <- strftime(links$date, format = '%A, %B %d, %Y')
 json.data <- toJSON(links)
 json.file <- file("data_files.js")
 writeLines(paste('var dataFiles =', json.data), json.file)
 close(json.file)
+print('Wrote data_files.js')
 
 # Remove totals, and select a few columns
 table2 <- table2.raw[!table2.raw$is_total,c('date', 'type', 'item', 'today')]
@@ -125,7 +127,7 @@ frame <- function(i) {
         col = 1
     )
 
-    # Under balance
+    # Balance number
     rect(
         xright =  min(table2.toplot$date),
         ybottom = mean(range(table2.toplot$balance)) * 0.95,
@@ -143,7 +145,7 @@ frame <- function(i) {
         pos = 4, font = 2:1, col = fg
     )
 
-    # Under interest rate
+    # Interest rate number
     rect(
         xleft =   weighted.mean(range(table2.toplot$date), c(3, 18)),
         ybottom = mean(range(table2.toplot$balance)) * 0.95,
@@ -156,31 +158,31 @@ frame <- function(i) {
         y = mean(range(table2.toplot$balance)) * c(1.1, 1),
         labels = c(
             'Interest rate',
-            sub('\\$-', '-$', paste('$', as.character(round(table2.toplot[i,'balance'] / 1000)), ' billion', sep = ''))
+            paste(as.character(table2.toplot[i,'rate']), '%', sep = '')
         ),
         pos = 2, font = 2:1, col = fg
     )
 
     # Under main
-    rect(
-        xleft   = weighted.mean(range(table2.toplot$date), c(2, 9)),
-        ybottom = weighted.mean(range(table2.toplot$balance), c(2, 15)),
-        xright  = max(table2.toplot$date),
-        ytop    = max(table2.toplot$balance),
-        col = 1
-    )
-    text(
-        x = weighted.mean(range(table2.toplot$date), c(1, 9)),
-        y = c(
-            weighted.mean(range(table2.toplot$balance), c(1, 15)),
-            weighted.mean(range(table2.toplot$balance), c(2, 15))
-        ),
-        labels = c(
-            'FMS Soundsystem',
-            strftime(table2.toplot[i,'date'], format = '%B %Y')
-        ),
-        col = fg, pos = 3, font = 2:1
-    )
+#   rect(
+#       xleft   = weighted.mean(range(table2.toplot$date), c(2, 9)),
+#       ybottom = weighted.mean(range(table2.toplot$balance), c(2, 15)),
+#       xright  = max(table2.toplot$date),
+#       ytop    = max(table2.toplot$balance),
+#       col = 1
+#   )
+#   text(
+#       x = weighted.mean(range(table2.toplot$date), c(1, 9)),
+#       y = c(
+#           weighted.mean(range(table2.toplot$balance), c(1, 15)),
+#           weighted.mean(range(table2.toplot$balance), c(2, 15))
+#       ),
+#       labels = c(
+#           'FMS Soundsystem',
+#           strftime(table2.toplot[i,'date'], format = '%B %Y')
+#       ),
+#       col = fg, pos = 3, font = 2:1
+#   )
 
     ticks <- seq(-2e5, 6e5, 1e5)
     axis(2, at = ticks, labels = round(ticks / 1000))
