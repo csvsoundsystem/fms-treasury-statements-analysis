@@ -19,9 +19,11 @@ if (!'table2.raw' %in% ls()) {
 }
 
 # Write some data for the website, skipping the top 40 for rolling
-json.data <- toJSON(sqldf('select date, url from [table2.raw] group by date')[-(1:40),])
-json.file <- file("data_files.json")
-writeLines(json.data, json.file)
+links <- sqldf('select date, url from [table2.raw] group by date')[-(1:40),]
+links$date <- strftime(links$date, format = '%B %d, %Y')
+json.data <- toJSON(links)
+json.file <- file("data_files.js")
+writeLines(paste('var dataFiles =', json.data), json.file)
 close(json.file)
 
 # Remove totals, and select a few columns
