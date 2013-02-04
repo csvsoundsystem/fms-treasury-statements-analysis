@@ -1,6 +1,7 @@
 library(plyr)
 library(aplpack)
 library(reshape2)
+library(RJSONIO)
 
 # Load the data
 if (!'table2.raw' %in% ls()) {
@@ -17,6 +18,12 @@ if (!'table2.raw' %in% ls()) {
     fed.rate$date <- strptime(fed.rate$date, format = '%m/%d/%y')
 }
 table2 <- table2.raw[!table2.raw$is_total,c('date', 'type', 'item', 'today')]
+
+# Write some data for the website, skipping the top 40 for rolling
+json.data <- toJSON(table2[-(1:40),c('url', 'date')])
+json.file <- file("data_files.json")
+writeLines(json.data, json.file)
+close(json.file)
 
 # Select only the items that are present on all days.
 n.days <- length(unique(table2$date))
