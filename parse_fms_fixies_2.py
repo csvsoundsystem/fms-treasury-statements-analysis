@@ -49,159 +49,162 @@ def get_footnote(line):
 		footnote = None
 	return footnote
 
-def parse_page(f):
-	f_name = '13013100.txt'
-	f = open(DIR_NAME + f_name, 'r').read()
 
+def parse_file(f_name='13013100.txt'):
+
+	f = open(DIR_NAME + f_name, 'r').read()
 	raw_pages = re.split(r'\d.*DAILY TREASURY STATEMENT.*PAGE:\s+\d\s{2}', f)
 	pages = []
 	for raw_page in raw_pages:
 		page = normalize_page_text(raw_page)
 		pages.append(page)
 
-	i = 4
-
-	# metadata
+	# file metadata
 	date = get_date_and_day(f_name)[0]
 	day = get_date_and_day(f_name)[1]
 	print date, day
-	print table_name, "\n"
 
-	for line in pages[i]:
-		table_name = get_table_name(line)
-		if table_name: break
+	for page in pages:
 
-	# table data
-	indent = 0
-	table = []
-	footnotes = {}
-	surtype_index = -1; subtype_index = -1; used_index = -1
-	subtype_indent = -1
-	type_ = None; subtype = None
-	for line in pages[i]:
-		#print line
-		row = {}
-		
-		# fill in metadata
-		row['table'] = table_name
-		row['date'] = date
-		row['day'] = day
-		
-		index = pages[i].index(line)
-		if index == used_index : continue
-		indent = len(re.search(r'^\s*', line).group())
-		
-		# skip table header rows
-		if re.match(r'\s{7,}', line): continue
-		if get_table_name(line): continue
-		
-		# save footnotes for later assignment to their rows
-		if get_footnote(line):
-			footnote = get_footnote(line)
-			footnotes[footnote[0]] = footnote[1]
-			continue
-		# note rows with footnotes for later assignment
-		if re.search(r'\d\/ ', line):
-			row['footnote'] = re.search(r'(\d)\/ ', line).group(1)
-		
-		# separate digits and words
-		digits = re.findall(r'(\d+)', line)
-		words = re.findall(r'[^\W\d]+:?', line)
-		text = ' '.join(words)
-		
-		# get type row
-		if len(digits) == 0 and text.endswith(':') and indent == 1:
-			type_ = text[:-1]
-			type_indent = indent
-			type_index = index
-			continue
-		if index == type_index + 1: pass
-		elif indent <= type_indent:
-			type_ = None
-		row['type'] = type_
+		page_index = pages.index(page)
+
+		for line in page:
+			table_name = get_table_name(line)
+			if table_name: break
+		print table_name, "\n"
+
+		# page defaults
+		indent = 0
+		table = []
+		footnotes = {}
+		surtype_index = -1; subtype_index = -1; used_index = -1
+		subtype_indent = -1
+		type_ = None; subtype = None
+
+		for line in page:
+			row = {}
 			
-		# get subtype row
-		if len(digits) == 0 and text.endswith(':'):
-			subtype = text[:-1]
-			subtype_indent = indent
-			subtype_index = index
-			continue
-		if index == subtype_index + 1: pass
-		elif indent <= subtype_indent:
-			subtype = None
-		row['subtype'] = subtype
-		
-		# get and merge two-line rows
-		if len(digits) == 0 and not text.endswith(':'):
-			try:
-				next_line = pages[i][index + 1]
-				next_digits = re.findall(r'(\d+)', next_line)
-				next_words = re.findall(r'[^\W\d]+:?', next_line)
-				if len(next_digits) != 0:
-					text = text + ' ' + ' '.join(next_words)
-					digits = next_digits
-					used_index = index + 1
-			except IndexError: pass
-		
-		# skip table annotations that aren't footnotes
-		# this is approximate at best
-		if len(digits) == 0: continue
+			# fill in metadata
+			row['table'] = table_name
+			row['date'] = date
+			row['day'] = day
 			
-		row['is_total'] = int('total' in text.lower())
-		
-		if i == 1:
-			row['account'] = text
-			row['close_today'] = digits[-4]
-			row['open_today'] = digits[-3]
-			row['open_mo'] = digits[-2]
-			row['open_fy'] = digits[-1]
-		elif i == 7:
-			row['classification'] = text
-			row['today'] = digits[-3]
-			row['mtd'] = digits[-2]
-			row['fytd'] = digits[-1]
-		elif i in [2, 3]:
-			row['item'] = text
-			row['today'] = digits[-3]
-			row['mtd'] = digits[-2]
-			row['fytd'] = digits[-1]
-			# tweak column names
-			row['account'] = row['type']
-			if i == 2:
-				row['type'] = 'deposit'
-			elif i == 3:
-				row['type'] = 'withdrawal'
-		elif i in [4, 5]:
-			row['item'] = text
-			try:
+			index = page.index(line)
+			if index == used_index : continue
+			indent = len(re.search(r'^\s*', line).group())
+			
+			# skip table header rows
+			if re.match(r'\s{7,}', line): continue
+			if get_table_name(line): continue
+			
+			# save footnotes for later assignment to their rows
+			if get_footnote(line):
+				footnote = get_footnote(line)
+				footnotes[footnote[0]] = footnote[1]
+				continue
+			# note rows with footnotes for later assignment
+			if re.search(r'\d\/ ', line):
+				row['footnote'] = re.search(r'(\d)\/ ', line).group(1)
+			
+			# separate digits and words
+			digits = re.findall(r'(\d+)', line)
+			words = re.findall(r'[^\W\d]+:?', line)
+			text = ' '.join(words)
+			
+			# get type row
+			if len(digits) == 0 and text.endswith(':') and indent == 1:
+				type_ = text[:-1]
+				type_indent = indent
+				type_index = index
+				continue
+			if index == type_index + 1: pass
+			elif indent <= type_indent:
+				type_ = None
+			row['type'] = type_
+				
+			# get subtype row
+			if len(digits) == 0 and text.endswith(':'):
+				subtype = text[:-1]
+				subtype_indent = indent
+				subtype_index = index
+				continue
+			if index == subtype_index + 1: pass
+			elif indent <= subtype_indent:
+				subtype = None
+			row['subtype'] = subtype
+			
+			# get and merge two-line rows
+			if len(digits) == 0 and not text.endswith(':'):
+				try:
+					next_line = page[index + 1]
+					next_digits = re.findall(r'(\d+)', next_line)
+					next_words = re.findall(r'[^\W\d]+:?', next_line)
+					if len(next_digits) != 0:
+						text = text + ' ' + ' '.join(next_words)
+						digits = next_digits
+						used_index = index + 1
+				except IndexError: pass
+			
+			# skip table annotations that aren't footnotes
+			# this is approximate at best
+			if len(digits) == 0: continue
+				
+			row['is_total'] = int('total' in text.lower())
+			
+			if page_index == 1:
+				row['account'] = text
+				row['close_today'] = digits[-4]
+				row['open_today'] = digits[-3]
+				row['open_mo'] = digits[-2]
+				row['open_fy'] = digits[-1]
+			elif page_index in [2, 3]:
+				row['item'] = text
 				row['today'] = digits[-3]
 				row['mtd'] = digits[-2]
 				row['fytd'] = digits[-1]
-			except:
-				print "WARNING:", line
-			
-		table.append(row)
+				# tweak column names
+				row['account'] = row['type']
+				if page_index == 2:
+					row['type'] = 'deposit'
+				elif page_index == 3:
+					row['type'] = 'withdrawal'
+			elif page_index in [4, 5]:
+				row['item'] = text
+				try:
+					row['today'] = digits[-3]
+					row['mtd'] = digits[-2]
+					row['fytd'] = digits[-1]
+				except:
+					print "WARNING:", line
+			elif page_index == 7:
+				row['classification'] = text
+				row['today'] = digits[-3]
+				row['mtd'] = digits[-2]
+				row['fytd'] = digits[-1]
+				
+			table.append(row)
 
-	for row in table:
-		try:
-			row['footnote'] = footnotes[row['footnote']]
-		except KeyError: pass
-		if row['item'].lower().strip() == 'total issues':
-			surtype_index = table.index(row)
-			row['surtype'] = 'issue'
+		for row in table:
+			try:
+				row['footnote'] = footnotes[row['footnote']]
+			except KeyError: pass
+			if row['item'].lower().strip() == 'total issues':
+				surtype_index = table.index(row)
+				row['surtype'] = 'issue'
 
-	if surtype_index != -1:
-		for row in table[:surtype_index]:
-			row['surtype'] = 'issue'
-		for row in table[surtype_index + 1:]:
-			row['surtype'] = 'redemption'
+		if surtype_index != -1:
+			for row in table[:surtype_index]:
+				row['surtype'] = 'issue'
+			for row in table[surtype_index + 1:]:
+				row['surtype'] = 'redemption'
 
 
-	df = pd.DataFrame(table)
+		df = pd.DataFrame(table)
 
-	if i == 1:
-		df = df.reindex(columns=['table', 'date', 'day', 'account', 'type', 'item', 'is_total', 'close_today', 'open_today', 'mtd', 'fytd', 'footnote'])
-	if i in [2,3]:
-		df = df.reindex(columns=['table', 'date', 'day', 'account', 'type', 'subtype', 'item', 'is_total', 'today', 'mtd', 'fytd', 'footnote'])
-	df
+		if page_index == 1:
+			df = df.reindex(columns=['table', 'date', 'day', 'account', 'type', 'item', 'is_total', 'close_today', 'open_today', 'mtd', 'fytd', 'footnote'])
+		if page_index in [2,3]:
+			df = df.reindex(columns=['table', 'date', 'day', 'account', 'type', 'subtype', 'item', 'is_total', 'today', 'mtd', 'fytd', 'footnote'])
+		
+		return df
 
