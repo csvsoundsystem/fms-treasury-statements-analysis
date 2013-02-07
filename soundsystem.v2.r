@@ -187,7 +187,7 @@ frame <- function(i) {
 #   )
 
     ticks <- seq(-2e5, 6e5, 1e5)
-    axis(2, at = ticks, labels = round(ticks / 1000))
+    axis(2, at = ticks, labels = round(ticks / 1000), col = fg, col.ticks = fg)
     face(i,
         x = table2.toplot[i,'date'],
         y = table2.toplot[i,'balance'],
@@ -203,7 +203,7 @@ frame <- function(i) {
          xlim = range(table2.toplot$date), ylim = c(-2, max(table2.toplot$rate))
     )
     mtext("Federal interest rate", side=4, line=3)
-    axis(4, at = 0:5, labels = paste(0:5, '%', sep = ''), lty = 2)
+    axis(4, at = 0:5, labels = paste(0:5, '%', sep = ''), lty = 2, col = fg, col.ticks = fg)
 }
 
 # frame(30)
