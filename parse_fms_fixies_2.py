@@ -86,6 +86,7 @@ def parse_page(page, page_index, date, day):
 
 	# total hack for when the treasury decided to switch
 	# which (upper or lower) line of two-line items gets the 0s
+	# NOTE THIS MAY NOT BE CORRECT OMFG
 	if date > datetime.date(2013, 1, 3) or date < datetime.date(2012, 6, 1):
 		two_line_delta = 1
 	else:
@@ -148,7 +149,7 @@ def parse_page(page, page_index, date, day):
 		
 		# get and merge two-line rows
 		if len(digits) == 0 and not text.endswith(':'):
-			if two_line_delta == 1:
+			if two_line_delta == 1 or page_index != 1:
 				try:
 					next_line = page[index + 1]
 					next_digits = re.findall(r'(\d+)', next_line)
@@ -158,7 +159,7 @@ def parse_page(page, page_index, date, day):
 						digits = next_digits
 						used_index = index + 1
 				except IndexError: pass
-			elif two_line_delta == -1:
+			elif two_line_delta == -1 and page_index == 1:
 				try:
 					prev_line = page[index - 1]
 					prev_digits = re.findall(r'(\d+)', prev_line)
