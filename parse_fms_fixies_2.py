@@ -62,20 +62,29 @@ def parse_file(f_name):
 	# file metadata
 	date = get_date_and_day(f_name)[0]
 	day = get_date_and_day(f_name)[1]
-	print date, day
+	print date, ',', day
 
 	dfs = {}
-	for page in pages[0:2]:
+	for page in pages[1:]:
 		page_index = pages.index(page)
 		dfs[page_index] = parse_page(page, page_index, date, day)
+
+	return dfs
 
 
 def parse_page(page, page_index, date, day):
 
-	#for line in page:
-	#	table_name = get_table_name(line)
-	#	if table_name: break
-	#print table_name, "\n"
+	table_name = None
+	table_name_2 = None
+	for line in page:
+		if table_name is None and get_table_name(line):
+			table_name = get_table_name(line)
+			table_name_index = page.index(line)
+			continue
+		if table_name is not None and get_table_name(line):
+			table_name_2 = get_table_name(line)
+			table_name_index_2 = page.index(line)
+			print table_name_2, table_name_index_2
 
 	# page defaults
 	indent = 0
@@ -83,16 +92,13 @@ def parse_page(page, page_index, date, day):
 	surtype_index = -1; type_index = -1; subtype_index = -1; used_index = -1
 	type_indent = -1; subtype_indent = -1
 	type_ = None; subtype = None
+	table_name = None
 
 	table = []
 	for line in page:
-		print line
+		#print line
 		row = {}
 		
-		# fill in metadata
-		if get_table_name(line):
-			row['table'] = get_table_name(line)
-			continue
 		#row['table'] = table_name
 		row['date'] = date
 		row['day'] = day
@@ -103,7 +109,10 @@ def parse_page(page, page_index, date, day):
 		
 		# skip table header rows
 		if re.match(r'\s{7,}', line): continue
-		if get_table_name(line): continue
+		if get_table_name(line):
+			table_name = get_table_name(line)
+			continue
+		row['table'] = table_name
 		
 		# save footnotes for later assignment to their rows
 		if get_footnote(line):
@@ -159,36 +168,49 @@ def parse_page(page, page_index, date, day):
 
 		row['is_total'] = int('total' in text.lower())
 		
-		if page_index == 1:
-			row['account'] = text
-			row['close_today'] = digits[-4]
-			row['open_today'] = digits[-3]
-			row['open_mo'] = digits[-2]
-			row['open_fy'] = digits[-1]
-		elif page_index in [2, 3]:
-			row['item'] = text
-			row['today'] = digits[-3]
-			row['mtd'] = digits[-2]
-			row['fytd'] = digits[-1]
-			# tweak column names
-			row['account'] = row['type']
-			if page_index == 2:
-				row['type'] = 'deposit'
-			elif page_index == 3:
-				row['type'] = 'withdrawal'
-		elif page_index in [4, 5]:
-			row['item'] = text
+		if page_index in [1, 6]:
 			try:
+				if page_index == 1:
+					row['account'] = text
+				elif page_index == 6:
+					try: row['item'] = text
+					except: print line
+				row['close_today'] = digits[-4]
+				row['open_today'] = digits[-3]
+				row['open_mo'] = digits[-2]
+				row['open_fy'] = digits[-1]
+			except:
+				print "\nWARNING:", line
+		elif page_index in [2, 3]:
+			try:
+				row['item'] = text
+				row['today'] = digits[-3]
+				row['mtd'] = digits[-2]
+				row['fytd'] = digits[-1]
+				# tweak column names
+				row['account'] = row['type']
+				if page_index == 2:
+					row['type'] = 'deposit'
+				elif page_index == 3:
+					row['type'] = 'withdrawal'
+			except:
+				print "\nWARNING:", line
+		elif page_index in [4, 5]:
+			try:
+				row['item'] = text
 				row['today'] = digits[-3]
 				row['mtd'] = digits[-2]
 				row['fytd'] = digits[-1]
 			except:
-				print "WARNING:", line
-		elif page_index == 7:
-			row['classification'] = text
-			row['today'] = digits[-3]
-			row['mtd'] = digits[-2]
-			row['fytd'] = digits[-1]
+				print "\nWARNING:", line
+		elif page_index in [7,8]:
+			try:
+				row['classification'] = text
+				row['today'] = digits[-3]
+				row['mtd'] = digits[-2]
+				row['fytd'] = digits[-1]
+			except:
+				print "\nWARNING:", line
 			
 		table.append(row)
 
@@ -197,9 +219,11 @@ def parse_page(page, page_index, date, day):
 		try:
 			row['footnote'] = footnotes[row['footnote']]
 		except KeyError: pass
-		if row['item'].lower().strip() == 'total issues':
-			surtype_index = table.index(row)
-			row['surtype'] = 'issue'
+		try:
+			if row['item'].lower().strip() == 'total issues':
+				surtype_index = table.index(row)
+				row['surtype'] = 'issue'
+		except KeyError: pass
 
 	# after-the-fact surtype assignment
 	if surtype_index != -1:
@@ -208,14 +232,25 @@ def parse_page(page, page_index, date, day):
 		for row in table[surtype_index + 1:]:
 			row['surtype'] = 'redemption'
 
+	# after-the-fact table_2 assignment
+	if table_name_2 is not None:
+		for row in table[table_name_index_2 + 1:]:
+			row['table'] = table_name_2
+
 	# create data frame from table list of row dicts
 	df = pd.DataFrame(table)
 
 	# and pretty them up
 	if page_index == 1:
-		df = df.reindex(columns=['table', 'date', 'day', 'account', 'type', 'item', 'is_total', 'close_today', 'open_today', 'mtd', 'fytd', 'footnote'])
+		df = df.reindex(columns=['table', 'date', 'day', 'account', 'type', 'item', 'is_total', 'close_today', 'open_today', 'open_mo', 'open_fy', 'footnote'])
 	if page_index in [2,3]:
 		df = df.reindex(columns=['table', 'date', 'day', 'account', 'type', 'subtype', 'item', 'is_total', 'today', 'mtd', 'fytd', 'footnote'])
+	elif page_index in [4,5]:
+		df = df.reindex(columns=['table', 'date', 'day', 'surtype', 'type', 'subtype', 'item', 'is_total', 'today', 'mtd', 'fytd', 'footnote'])
+	elif page_index == 6:
+		df = df.reindex(columns=['table', 'date', 'day', 'type', 'item', 'is_total', 'close_today', 'open_today', 'open_mo', 'open_fy', 'footnote'])
+	elif page_index in [7,8]:
+		df = df.reindex(columns=['table', 'date', 'day', 'type', 'classification', 'is_total', 'today', 'mtd', 'fytd', 'footnote'])
 	
 	return df
 
