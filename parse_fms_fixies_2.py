@@ -62,6 +62,7 @@ def parse_file(f_name):
 	# file metadata
 	date = get_date_and_day(f_name)[0]
 	day = get_date_and_day(f_name)[1]
+	print f_name
 	print date, ',', day
 
 	dfs = {}
@@ -74,18 +75,6 @@ def parse_file(f_name):
 
 def parse_page(page, page_index, date, day):
 
-	table_name = None
-	table_name_2 = None
-	for line in page:
-		if table_name is None and get_table_name(line):
-			table_name = get_table_name(line)
-			table_name_index = page.index(line)
-			continue
-		if table_name is not None and get_table_name(line):
-			table_name_2 = get_table_name(line)
-			table_name_index_2 = page.index(line)
-			print table_name_2, table_name_index_2
-
 	# page defaults
 	indent = 0
 	footnotes = {}
@@ -93,13 +82,20 @@ def parse_page(page, page_index, date, day):
 	type_indent = -1; subtype_indent = -1
 	type_ = None; subtype = None
 	table_name = None
+	table_name_2 = None
+
+	# total hack for when the treasury decided to switch
+	# which (upper or lower) line of two-line items gets the 0s
+	if date > datetime.date(2013, 1, 3) or date < datetime.date(2012, 6, 1):
+		two_line_delta = 1
+	else:
+		two_line_delta = -1
 
 	table = []
 	for line in page:
 		#print line
 		row = {}
 		
-		#row['table'] = table_name
 		row['date'] = date
 		row['day'] = day
 		
@@ -152,16 +148,27 @@ def parse_page(page, page_index, date, day):
 		
 		# get and merge two-line rows
 		if len(digits) == 0 and not text.endswith(':'):
-			try:
-				next_line = page[index + 1]
-				next_digits = re.findall(r'(\d+)', next_line)
-				next_words = re.findall(r'[^\W\d]+:?', next_line)
-				if len(next_digits) != 0:
-					text = text + ' ' + ' '.join(next_words)
-					digits = next_digits
-					used_index = index + 1
-			except IndexError: pass
-		
+			if two_line_delta == 1:
+				try:
+					next_line = page[index + 1]
+					next_digits = re.findall(r'(\d+)', next_line)
+					next_words = re.findall(r'[^\W\d]+:?', next_line)
+					if len(next_digits) != 0:
+						text = text + ' ' + ' '.join(next_words)
+						digits = next_digits
+						used_index = index + 1
+				except IndexError: pass
+			elif two_line_delta == -1:
+				try:
+					prev_line = page[index - 1]
+					prev_digits = re.findall(r'(\d+)', prev_line)
+					prev_words = re.findall(r'[^\W\d]+:?', prev_line)
+					if len(prev_digits) != 0:
+						text = ' '.join(prev_words) + ' ' + text
+						digits = prev_digits
+						get_rid_of_prev_line = table.pop()
+				except IndexError: pass
+
 		# skip table annotations that aren't footnotes
 		# this is approximate at best
 		if len(digits) == 0: continue
@@ -180,7 +187,7 @@ def parse_page(page, page_index, date, day):
 				row['open_mo'] = digits[-2]
 				row['open_fy'] = digits[-1]
 			except:
-				print "\nWARNING:", line
+				print "WARNING:", line
 		elif page_index in [2, 3]:
 			try:
 				row['item'] = text
@@ -194,7 +201,7 @@ def parse_page(page, page_index, date, day):
 				elif page_index == 3:
 					row['type'] = 'withdrawal'
 			except:
-				print "\nWARNING:", line
+				print "WARNING:", line
 		elif page_index in [4, 5]:
 			try:
 				row['item'] = text
@@ -202,7 +209,7 @@ def parse_page(page, page_index, date, day):
 				row['mtd'] = digits[-2]
 				row['fytd'] = digits[-1]
 			except:
-				print "\nWARNING:", line
+				print "WARNING:", line
 		elif page_index in [7,8]:
 			try:
 				row['classification'] = text
@@ -210,7 +217,7 @@ def parse_page(page, page_index, date, day):
 				row['mtd'] = digits[-2]
 				row['fytd'] = digits[-1]
 			except:
-				print "\nWARNING:", line
+				print "WARNING:", line
 			
 		table.append(row)
 
@@ -233,9 +240,9 @@ def parse_page(page, page_index, date, day):
 			row['surtype'] = 'redemption'
 
 	# after-the-fact table_2 assignment
-	if table_name_2 is not None:
-		for row in table[table_name_index_2 + 1:]:
-			row['table'] = table_name_2
+	#if table_name_2 is not None:
+	#	for row in table[table_name_index_2 + 1:]:
+	#		row['table'] = table_name_2
 
 	# create data frame from table list of row dicts
 	df = pd.DataFrame(table)
