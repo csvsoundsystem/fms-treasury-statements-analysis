@@ -240,11 +240,6 @@ def parse_page(page, page_index, date, day):
 		for row in table[surtype_index + 1:]:
 			row['surtype'] = 'redemption'
 
-	# after-the-fact table_2 assignment
-	#if table_name_2 is not None:
-	#	for row in table[table_name_index_2 + 1:]:
-	#		row['table'] = table_name_2
-
 	# create data frame from table list of row dicts
 	df = pd.DataFrame(table)
 
