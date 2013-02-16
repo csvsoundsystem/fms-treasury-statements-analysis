@@ -86,7 +86,7 @@ def parse_page(page, page_index, date, day):
 
 	# total hack for when the treasury decided to switch
 	# which (upper or lower) line of two-line items gets the 0s
-	# NOTE THIS MAY NOT BE CORRECT OMFG
+	# NOTE: THIS IS ONLY FOR TABLE I, BECAUSE OF COURSE
 	if date > datetime.date(2013, 1, 3) or date < datetime.date(2012, 6, 1):
 		two_line_delta = 1
 	else:
@@ -171,7 +171,7 @@ def parse_page(page, page_index, date, day):
 				except IndexError: pass
 
 		# skip table annotations that aren't footnotes
-		# this is approximate at best
+		# this is a band-aid at best, sorry folks
 		if len(digits) == 0: continue
 
 		row['is_total'] = int('total' in text.lower())
