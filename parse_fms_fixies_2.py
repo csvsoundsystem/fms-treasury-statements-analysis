@@ -10,12 +10,14 @@ import StringIO
 
 DIR_NAME = '/Users/bjdewilde/Desktop/hackathon/data/fixies/'
 
+################################################################################
 def get_date_and_day(f_name):
 	raw_date = re.search(r'(\d+).txt', f_name).group(1)
 	date = datetime.date(2000+int(raw_date[0:2]), int(raw_date[2:4]), int(raw_date[4:6]))
 	day = datetime.datetime.strftime(date, '%A')
 	return date, day
 
+################################################################################
 def get_table_name(line):
 	try:
 		table_line = re.search(r'\s+TABLE.*', line).group()
@@ -24,6 +26,7 @@ def get_table_name(line):
 		table_name = None
 	return table_name
 
+################################################################################
 def normalize_page_text(page):
 	# split on line breaks
 	lines = re.split(r'\r\n', page)
@@ -41,6 +44,7 @@ def normalize_page_text(page):
 	lines = [line for line in lines if line!='' and line!=' ']
 	return lines
 
+################################################################################
 def get_footnote(line):
 	try:
 		footnote_match = re.search(r'^\s?(\d)\/(.*)', line)
@@ -49,7 +53,7 @@ def get_footnote(line):
 		footnote = None
 	return footnote
 
-
+################################################################################
 def parse_file(f_name):
 
 	f = open(DIR_NAME + f_name, 'r').read()
@@ -72,7 +76,7 @@ def parse_file(f_name):
 
 	return dfs
 
-
+################################################################################
 def parse_page(page, page_index, date, day):
 
 	# page defaults
